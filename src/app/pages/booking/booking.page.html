@@ -1,0 +1,88 @@
+@if (trip(); as trip) {
+  <section class="page container">
+    <app-booking-stepper [step]="step()" />
+    <div class="split-layout">
+      <div class="card pad">
+        @switch (step()) {
+          @case (1) {
+            <h1>Trip dates</h1>
+            <p class="muted">Confirm when you travel and who is coming.</p>
+            <div class="form-grid" style="margin-top:18px">
+              <label class="field span-2">
+                <span>Travel dates</span>
+                <input class="input" [ngModel]="draft().dateLabel" (ngModelChange)="update('dateLabel', $event)" name="dates" />
+              </label>
+              <label class="field">
+                <span>Travelers</span>
+                <input class="input" type="number" min="1" [ngModel]="draft().travelers" (ngModelChange)="update('travelers', +$event)" name="travelers" />
+              </label>
+            </div>
+          }
+          @case (2) {
+            <h1>Traveler details</h1>
+            <div class="form-grid" style="margin-top:18px">
+              <label class="field"><span>First name</span><input class="input" [ngModel]="draft().firstName" (ngModelChange)="update('firstName', $event)" name="first" /></label>
+              <label class="field"><span>Last name</span><input class="input" [ngModel]="draft().lastName" (ngModelChange)="update('lastName', $event)" name="last" /></label>
+              <label class="field span-2"><span>Email</span><input class="input" type="email" [ngModel]="draft().email" (ngModelChange)="update('email', $event)" name="email" /></label>
+            </div>
+          }
+          @case (3) {
+            <h1>Reservation type</h1>
+            <div class="pills" style="margin-top:18px">
+              @for (type of types; track type) {
+                <button class="pill" type="button" [class.active]="draft().reservationType === type" (click)="update('reservationType', type)">{{ type.charAt(0) + type.slice(1).toLowerCase() }}</button>
+              }
+            </div>
+            <label class="field" style="margin-top:16px">
+              <span>Notes</span>
+              <textarea class="input" rows="4" [ngModel]="draft().notes" (ngModelChange)="update('notes', $event)" name="notes" placeholder="Dietary needs, room requests..."></textarea>
+            </label>
+          }
+          @case (4) {
+            <h1>Payment</h1>
+            <div class="pills" style="margin-top:18px">
+              @for (method of methods; track method) {
+                <button class="pill" type="button" [class.active]="draft().paymentMethod === method" (click)="update('paymentMethod', method)">{{ method.replace('_', ' ') }}</button>
+              }
+            </div>
+            @if (draft().paymentMethod === 'CARD') {
+              <div class="form-grid" style="margin-top:18px">
+                <label class="field span-2"><span>Name on card</span><input class="input" [ngModel]="draft().cardName" (ngModelChange)="update('cardName', $event)" name="cardName" /></label>
+                <label class="field span-2"><span>Card number</span><input class="input" [ngModel]="draft().cardNumber" (ngModelChange)="update('cardNumber', $event)" name="cardNumber" /></label>
+              </div>
+            }
+          }
+          @case (5) {
+            <h1>Review</h1>
+            <p>{{ draft().firstName }} {{ draft().lastName }} · {{ draft().email }}</p>
+            <p>{{ draft().dateLabel }} · {{ draft().travelers }} travelers · {{ draft().reservationType }}</p>
+            <p>Pay with {{ draft().paymentMethod.replace('_', ' ') }}</p>
+            <p><strong>Total {{ total() | currency:'USD':'symbol':'1.0-0' }}</strong></p>
+          }
+          @case (6) {
+            <h1>You're booked</h1>
+            <p class="muted">{{ trip.title }} is confirmed. Manage it from reservations or My trips.</p>
+            <button class="btn btn-primary" type="button" (click)="goReservations()">View reservations</button>
+            <a class="btn btn-outline" routerLink="/my-trips">Go to My trips</a>
+          }
+        }
+        @if (step() < 6) {
+          <div class="nav-row">
+            <button class="btn btn-ghost" type="button" (click)="back()" [disabled]="step() === 1">Back</button>
+            @if (step() < 5) {
+              <button class="btn btn-primary" type="button" (click)="next()">Continue</button>
+            } @else {
+              <button class="btn btn-primary" type="button" (click)="confirm()">Confirm booking</button>
+            }
+          </div>
+        }
+      </div>
+      <app-booking-summary [trip]="trip" [travelers]="draft().travelers" [dates]="draft().dateLabel" />
+    </div>
+  </section>
+} @else {
+  <section class="page container">
+    <h1>Trip unavailable</h1>
+    <a routerLink="/trips">Choose another trip</a>
+  </section>
+}

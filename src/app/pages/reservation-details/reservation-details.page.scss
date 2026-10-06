@@ -1,0 +1,7 @@
+.pad { padding: 24px; }
+.display { font-size: 42px; margin: 8px 0 12px; }
+dl { display: grid; gap: 12px; margin: 22px 0; }
+dt { color: var(--muted); font-size: 12px; }
+dd { margin: 0; font-weight: 600; }
+img { width: 100%; height: 180px; object-fit: cover; border-radius: 16px; }
+a:not(.btn):not(.btn-icon) { color: var(--teal); }

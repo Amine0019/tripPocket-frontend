@@ -1,0 +1,15 @@
+<section class="auth-wrap container">
+  <form class="card auth-card" (submit)="$event.preventDefault(); submit()">
+    <p class="eyebrow">tripPocket</p>
+    <h1 class="display">Welcome back</h1>
+    <p class="muted">Sign in to manage trips, reservations, and expenses.</p>
+    <div class="stack">
+      <label class="field"><span>Email</span><input class="input" type="email" [(ngModel)]="email" name="email" /></label>
+      <label class="field"><span>Password</span><input class="input" type="password" [(ngModel)]="password" name="password" /></label>
+      @if (error()) { <p class="err">{{ error() }}</p> }
+      <button class="btn btn-primary" type="submit">Log in</button>
+      <a routerLink="/forgot-password">Forgot password?</a>
+      <p>New here? <a routerLink="/register">Create an account</a></p>
+    </div>
+  </form>
+</section>

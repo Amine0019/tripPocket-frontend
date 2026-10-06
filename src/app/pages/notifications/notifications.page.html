@@ -1,0 +1,18 @@
+<section class="page container">
+  <app-page-header eyebrow="Inbox" title="Notifications" subtitle="Booking updates, reminders, and itinerary changes.">
+    <button class="btn btn-outline" type="button" (click)="markAll()" [disabled]="!unread()">Mark all read</button>
+  </app-page-header>
+  <div class="tabs" style="margin-bottom:18px">
+    <button type="button" [class.active]="!onlyUnread()" (click)="onlyUnread.set(false)">All</button>
+    <button type="button" [class.active]="onlyUnread()" (click)="onlyUnread.set(true)">Unread ({{ unread() }})</button>
+  </div>
+  <div class="card pad">
+    @if (items().length) {
+      @for (item of items(); track item.id) {
+        <app-notification-item [item]="item" (read)="mark($event)" />
+      }
+    } @else {
+      <app-empty-state title="You're all caught up" message="New booking alerts will land here." />
+    }
+  </div>
+</section>

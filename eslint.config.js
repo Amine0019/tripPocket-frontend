@@ -30,14 +30,23 @@ module.exports = tseslint.config(
           style: "kebab-case",
         },
       ],
+      "@angular-eslint/component-class-suffix": [
+        "error",
+        {
+          suffixes: ["Component", "Page"],
+        },
+      ],
+      "@typescript-eslint/array-type": "off",
+      "@angular-eslint/no-output-native": "off",
     },
   },
   {
     files: ["**/*.html"],
     extends: [
       ...angular.configs.templateRecommended,
-      ...angular.configs.templateAccessibility,
     ],
-    rules: {},
+    rules: {
+      "@angular-eslint/template/eqeqeq": "off",
+    },
   }
 );

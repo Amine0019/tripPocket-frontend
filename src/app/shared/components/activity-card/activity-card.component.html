@@ -1,0 +1,15 @@
+<article class="card">
+  <a [routerLink]="['/activities', activity.id]" class="media">
+    <img [src]="activity.image" [alt]="activity.name" />
+    <span class="cat">{{ activity.category }}</span>
+  </a>
+  <div class="body">
+    <h3>{{ activity.name }}</h3>
+    <p>{{ activity.description }}</p>
+    <div class="meta">
+      <span>{{ activity.durationHours }} hrs</span>
+      <strong>{{ activity.price | currency:'USD':'symbol':'1.0-0' }}</strong>
+    </div>
+    <a class="btn btn-primary" [routerLink]="['/activities', activity.id]">View Activity</a>
+  </div>
+</article>

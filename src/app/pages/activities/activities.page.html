@@ -1,0 +1,19 @@
+<section class="page container">
+  <app-page-header eyebrow="Experiences" title="Activities" subtitle="Add culture, food, nature, and adventure to any trip." />
+  <div class="pills" style="margin-bottom:24px">
+    @for (item of categories; track item) {
+      <button class="pill" type="button" [class.active]="category() === item" (click)="category.set(item)">
+        {{ item === 'ALL' ? 'All' : item.charAt(0) + item.slice(1).toLowerCase() }}
+      </button>
+    }
+  </div>
+  @if (activities().length) {
+    <div class="grid-3">
+      @for (activity of activities(); track activity.id) {
+        <app-activity-card [activity]="activity" />
+      }
+    </div>
+  } @else {
+    <app-empty-state title="No activities" message="Try another category." />
+  }
+</section>

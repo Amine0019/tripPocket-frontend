@@ -1,0 +1,7 @@
+<a class="dest" [routerLink]="['/trips']" [queryParams]="{ q: destination.name }">
+  <img [src]="destination.image" [alt]="destination.name" />
+  <div>
+    <h3>{{ destination.name }}</h3>
+    <p>{{ destination.country }} · {{ destination.tripsCount }} trips</p>
+  </div>
+</a>

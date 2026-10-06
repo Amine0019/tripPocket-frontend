@@ -1,0 +1,6 @@
+article {
+  display: grid; grid-template-columns: 72px 1fr auto; gap: 12px; align-items: center;
+  background: #f6f9f8; border-radius: 16px; padding: 12px;
+}
+img { width: 72px; height: 56px; object-fit: cover; border-radius: 10px; }
+p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }

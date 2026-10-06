@@ -1,0 +1,17 @@
+.overlay {
+  position: fixed; inset: 0; background: rgba(12, 31, 38, 0.38); z-index: 50;
+  display: flex; justify-content: flex-end;
+}
+.panel {
+  width: min(380px, 100%);
+  background: #fff;
+  padding: 28px;
+  display: grid;
+  gap: 14px;
+  animation: slide .25s ease;
+}
+h3 { margin: 0; }
+@keyframes slide {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}

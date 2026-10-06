@@ -1,0 +1,25 @@
+:host { display: inline-flex; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.overlay {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(255,255,255,0.92) !important;
+  color: var(--ink);
+}
+
+.mint { background: #e7f6ee; color: #1d7a4f; }
+.sand { background: #f8ecd8; color: #9a6b2a; }
+.ink { background: rgba(20,30,34,0.72); color: #fff; }
+.mute { background: #eef1f2; color: #66747a; }

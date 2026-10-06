@@ -1,0 +1,8 @@
+.item {
+  width: 100%; text-align: left; display: grid; grid-template-columns: 44px 1fr; gap: 12px;
+  background: #fff; border: 1px solid #edf2f1; border-radius: 18px; padding: 16px; margin-bottom: 12px;
+}
+.unread { box-shadow: 0 0 0 2px rgba(27,124,110,.12); }
+.icon { width: 44px; height: 44px; border-radius: 12px; background: var(--teal-soft); color: var(--teal); display: grid; place-items: center; }
+p { margin: 4px 0; color: var(--muted); }
+small { color: #8a979c; }

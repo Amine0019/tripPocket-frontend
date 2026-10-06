@@ -1,0 +1,58 @@
+<section class="page container">
+  <app-page-header eyebrow="Your travels" title="My trips" subtitle="Track booked journeys, progress, and saved ideas.">
+    <a class="btn btn-primary" routerLink="/trips">Plan a new trip</a>
+  </app-page-header>
+
+  @if (upcoming(); as trip) {
+    <article class="card highlight">
+      <img [src]="trip.image" [alt]="trip.title" />
+      <div>
+        <p class="eyebrow">{{ trip.tripCode || 'Upcoming' }}</p>
+        <h2>{{ trip.title }}</h2>
+        <p class="muted">{{ trip.destination }} · {{ trip.startDate }} → {{ trip.endDate }}</p>
+        @if (trip.countdownDays != null) {
+          <p>Starts in <strong>{{ trip.countdownDays }}</strong> days</p>
+        }
+        @if (trip.progress != null) {
+          <div class="bar"><span [style.width.%]="trip.progress"></span></div>
+          <small>{{ trip.progress }}% ready</small>
+        }
+        <a class="btn btn-outline" [routerLink]="['/trips', trip.id]">Open itinerary</a>
+      </div>
+    </article>
+  }
+
+  <div class="tabs" style="margin: 28px 0 18px">
+    <button type="button" [class.active]="tab() === 'booked'" (click)="tab.set('booked')">Booked</button>
+    <button type="button" [class.active]="tab() === 'saved'" (click)="tab.set('saved')">Saved</button>
+  </div>
+
+  @if (tab() === 'booked') {
+    <div class="pills" style="margin-bottom:18px">
+      @for (item of ['ALL', 'PLANNED', 'CONFIRMED', 'ACTIVE', 'COMPLETED', 'CANCELLED']; track item) {
+        <button class="pill" type="button" [class.active]="status() === item" (click)="status.set($any(item))">{{ item === 'ALL' ? 'All' : item.charAt(0) + item.slice(1).toLowerCase() }}</button>
+      }
+    </div>
+    @if (booked().length) {
+      <div class="grid-3">
+        @for (trip of booked(); track trip.id) {
+          <app-trip-card [trip]="trip" />
+        }
+      </div>
+    } @else {
+      <app-empty-state title="No booked trips yet" message="Explore a destination and complete a booking to see it here.">
+        <a class="btn btn-primary" routerLink="/trips">Explore trips</a>
+      </app-empty-state>
+    }
+  } @else {
+    @if (saved().length) {
+      <div class="grid-3">
+        @for (trip of saved(); track trip.id) {
+          <app-trip-card [trip]="trip" />
+        }
+      </div>
+    } @else {
+      <app-empty-state title="Nothing saved" message="Tap the heart on a trip to keep it here." />
+    }
+  }
+</section>

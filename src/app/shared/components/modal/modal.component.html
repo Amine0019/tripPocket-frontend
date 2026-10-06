@@ -1,0 +1,8 @@
+@if (open) {
+  <div class="scrim" (click)="closed.emit()">
+    <div class="sheet" (click)="$event.stopPropagation()">
+      <button class="x" type="button" (click)="closed.emit()" aria-label="Close">×</button>
+      <ng-content />
+    </div>
+  </div>
+}

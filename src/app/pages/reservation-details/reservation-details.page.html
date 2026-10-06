@@ -1,0 +1,42 @@
+@if (reservation(); as item) {
+  <section class="page container split-layout">
+    <div class="card pad">
+      <p class="eyebrow">{{ item.type }}</p>
+      <h1 class="display">{{ item.title }}</h1>
+      <app-status-badge [status]="item.status" [overlay]="false" />
+      <dl>
+        <div><dt>Trip</dt><dd><a [routerLink]="['/trips', item.tripId]">{{ item.tripTitle }}</a></dd></div>
+        <div><dt>Dates</dt><dd>{{ item.dateLabel }}</dd></div>
+        <div><dt>Travelers</dt><dd>{{ item.travelers }}</dd></div>
+        <div><dt>Payment</dt><dd>{{ pay() }}</dd></div>
+        <div><dt>Amount</dt><dd>{{ item.amount | currency:'USD':'symbol':'1.0-0' }}</dd></div>
+      </dl>
+      @if (item.status === 'PENDING' || item.status === 'CONFIRMED') {
+        <button class="btn btn-outline" type="button" (click)="confirmOpen.set(true)">Cancel reservation</button>
+      }
+      <a class="btn btn-ghost" routerLink="/reservations">Back to list</a>
+    </div>
+    @if (trip(); as trip) {
+      <aside class="card pad">
+        <img [src]="trip.image" [alt]="trip.title" />
+        <h3>{{ trip.title }}</h3>
+        <p class="muted">{{ trip.destination }}</p>
+        <a class="btn btn-primary" [routerLink]="['/trips', trip.id]">View trip</a>
+      </aside>
+    }
+  </section>
+} @else {
+  <section class="page container">
+    <h1>Reservation not found</h1>
+    <a routerLink="/reservations">Back</a>
+  </section>
+}
+
+<app-modal [open]="confirmOpen()" (closed)="confirmOpen.set(false)">
+  <h2>Cancel reservation?</h2>
+  <p class="muted">This cannot be undone from the traveler view, but the record stays in your history.</p>
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+    <button class="btn btn-outline" type="button" (click)="confirmOpen.set(false)">Keep</button>
+    <button class="btn btn-primary" type="button" (click)="cancel()">Confirm cancel</button>
+  </div>
+</app-modal>

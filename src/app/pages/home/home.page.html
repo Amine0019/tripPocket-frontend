@@ -1,0 +1,59 @@
+<app-hero [image]="heroImage" [query]="query()" (search)="search($event)" />
+
+<section class="section container">
+  <div class="page-toolbar scroll-reveal">
+    <div class="scroll-reveal">
+      <p class="eyebrow">Featured trips</p>
+      <h2 class="display" style="font-size:42px">Handpicked for this season</h2>
+    </div>
+    <a class="btn btn-outline" routerLink="/trips">View all trips</a>
+  </div>
+  <div class="grid-3">
+    @for (trip of featured(); track trip.id) {
+      <app-trip-card class="scroll-reveal" [trip]="trip" />
+    }
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <p class="eyebrow scroll-reveal">Travel styles</p>
+    <h2 class="display scroll-reveal" style="font-size:42px;margin-bottom:22px">Find a trip by mood</h2>
+    <div class="pills scroll-reveal">
+      @for (category of categories; track category) {
+        <button class="pill" type="button" (click)="openCategory(category)">{{ category }}</button>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="page-toolbar scroll-reveal">
+    <div class="scroll-reveal">
+      <p class="eyebrow">Destinations</p>
+      <h2 class="display" style="font-size:42px">Where to next</h2>
+    </div>
+  </div>
+  <div class="grid-dest">
+    @for (destination of destinations(); track destination.id) {
+      <app-destination-card class="scroll-reveal" [destination]="destination" />
+    }
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="page-toolbar scroll-reveal">
+      <div class="scroll-reveal">
+        <p class="eyebrow">Experiences</p>
+        <h2 class="display" style="font-size:42px">Activities worth adding</h2>
+      </div>
+      <a class="btn btn-outline" routerLink="/activities">Browse activities</a>
+    </div>
+    <div class="grid-3">
+      @for (activity of activities(); track activity.id) {
+        <app-activity-card class="scroll-reveal" [activity]="activity" />
+      }
+    </div>
+  </div>
+</section>

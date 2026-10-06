@@ -1,0 +1,8 @@
+<article>
+  <div class="icon">▣</div>
+  <div>
+    <strong>{{ expense.title }}</strong>
+    <p>{{ expense.category.charAt(0) + expense.category.slice(1).toLowerCase() }} · {{ pay() }}</p>
+  </div>
+  <b>{{ expense.amount | currency:'USD':'symbol':'1.0-0' }}</b>
+</article>

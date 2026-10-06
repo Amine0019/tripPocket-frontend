@@ -1,0 +1,25 @@
+<section class="page container">
+  <app-page-header eyebrow="Account" title="Profile" subtitle="Manage the traveler details used across bookings." />
+  <div class="split-layout">
+    <form class="card pad" (submit)="$event.preventDefault(); save()">
+      <div class="form-grid">
+        <label class="field"><span>First name</span><input class="input" [(ngModel)]="draft.firstName" name="first" /></label>
+        <label class="field"><span>Last name</span><input class="input" [(ngModel)]="draft.lastName" name="last" /></label>
+        <label class="field span-2"><span>Email</span><input class="input" [(ngModel)]="draft.email" name="email" /></label>
+        <label class="field"><span>Phone</span><input class="input" [(ngModel)]="draft.phone" name="phone" /></label>
+        <label class="field"><span>Country</span><input class="input" [(ngModel)]="draft.country" name="country" /></label>
+        <label class="field span-2"><span>Language</span><input class="input" [(ngModel)]="draft.language" name="language" /></label>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button class="btn btn-primary" type="submit">Save changes</button>
+        <button class="btn btn-outline" type="button" (click)="logout()">Log out</button>
+      </div>
+    </form>
+    <aside class="card pad">
+      <div class="avatar">{{ user().avatarInitials }}</div>
+      <h3>{{ user().firstName }} {{ user().lastName }}</h3>
+      <p class="muted">Member since {{ user().memberSince }} · {{ user().role }}</p>
+      <p>{{ user().email }}</p>
+    </aside>
+  </div>
+</section>

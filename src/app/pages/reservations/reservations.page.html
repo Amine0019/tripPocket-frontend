@@ -1,0 +1,28 @@
+<section class="page container">
+  <app-page-header eyebrow="Bookings" title="Reservations" subtitle="Hotels, transport, activities, and trip packages in one list." />
+  <div class="pills" style="margin-bottom:18px">
+    @for (item of statuses; track item) {
+      <button class="pill" type="button" [class.active]="status() === item" (click)="status.set(item)">
+        {{ item === 'ALL' ? 'All' : item.charAt(0) + item.slice(1).toLowerCase() }}
+      </button>
+    }
+  </div>
+  <div class="card list">
+    @if (items().length) {
+      @for (reservation of items(); track reservation.id) {
+        <app-reservation-card [reservation]="reservation" (cancel)="askCancel($event)" />
+      }
+    } @else {
+      <app-empty-state title="No reservations" message="Book a trip or activity to populate this list." />
+    }
+  </div>
+</section>
+
+<app-modal [open]="!!pendingId()" (closed)="pendingId.set(null)">
+  <h2>Cancel this reservation?</h2>
+  <p class="muted">This marks the booking as cancelled. You can still view it in the cancelled filter.</p>
+  <div class="row">
+    <button class="btn btn-outline" type="button" (click)="pendingId.set(null)">Keep it</button>
+    <button class="btn btn-primary" type="button" (click)="confirmCancel()">Cancel reservation</button>
+  </div>
+</app-modal>

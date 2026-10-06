@@ -1,0 +1,121 @@
+import { Reservation } from '../models/models';
+
+export const MOCK_RESERVATIONS: Reservation[] = [
+  {
+    id: 'res-hotel',
+    tripId: 'japan',
+    tripTitle: 'Discover Japan',
+    title: 'Tokyo Garden Hotel',
+    type: 'ACCOMMODATION',
+    dateLabel: 'May 18–21',
+    date: '2025-05-18',
+    paymentMethod: 'CARD',
+    amount: 640,
+    status: 'CONFIRMED',
+    travelers: 2
+  },
+  {
+    id: 'res-rail',
+    tripId: 'japan',
+    tripTitle: 'Discover Japan',
+    title: 'Shinkansen Rail Pass',
+    type: 'TRANSPORT',
+    dateLabel: 'May 21',
+    date: '2025-05-21',
+    paymentMethod: 'CARD',
+    amount: 284,
+    status: 'CONFIRMED',
+    travelers: 2
+  },
+  {
+    id: 'res-tea',
+    tripId: 'japan',
+    tripTitle: 'Discover Japan',
+    title: 'Kyoto Tea Ceremony',
+    type: 'ACTIVITY',
+    dateLabel: 'May 23',
+    date: '2025-05-23',
+    paymentMethod: 'CARD',
+    amount: 96,
+    status: 'PENDING',
+    travelers: 2
+  },
+  {
+    id: 'res-trip-japan',
+    tripId: 'japan',
+    tripTitle: 'Discover Japan',
+    title: 'Discover Japan trip package',
+    type: 'TRIP',
+    dateLabel: 'May 18–25',
+    date: '2025-05-18',
+    paymentMethod: 'CARD',
+    amount: 2580,
+    status: 'CONFIRMED',
+    travelers: 2
+  },
+  {
+    id: 'res-istanbul-hotel',
+    tripId: 'istanbul',
+    tripTitle: 'Istanbul Crossroads',
+    title: 'Bosphorus View Hotel',
+    type: 'ACCOMMODATION',
+    dateLabel: 'Apr 12–18',
+    date: '2025-04-12',
+    paymentMethod: 'PAYPAL',
+    amount: 520,
+    status: 'CONFIRMED',
+    travelers: 2
+  },
+  {
+    id: 'res-cruise',
+    tripId: 'istanbul',
+    tripTitle: 'Istanbul Crossroads',
+    title: 'Bosphorus Sunset Cruise',
+    type: 'ACTIVITY',
+    dateLabel: 'Apr 16',
+    date: '2025-04-16',
+    paymentMethod: 'CARD',
+    amount: 136,
+    status: 'PENDING',
+    travelers: 2
+  },
+  {
+    id: 'res-paris',
+    tripId: 'paris',
+    tripTitle: 'Paris in Slow Motion',
+    title: 'Marais apartment stay',
+    type: 'ACCOMMODATION',
+    dateLabel: 'Oct 2–7',
+    date: '2024-10-02',
+    paymentMethod: 'CARD',
+    amount: 890,
+    status: 'COMPLETED',
+    travelers: 2
+  },
+  {
+    id: 'res-rome',
+    tripId: 'rome',
+    tripTitle: 'Rome After Hours',
+    title: 'Pasta workshop',
+    type: 'ACTIVITY',
+    dateLabel: 'Jun 12',
+    date: '2024-06-12',
+    paymentMethod: 'CASH',
+    amount: 92,
+    status: 'COMPLETED',
+    travelers: 2
+  },
+  {
+    id: 'res-barcelona',
+    tripId: 'barcelona',
+    tripTitle: 'Barcelona Color Study',
+    title: 'Eixample boutique hotel',
+    type: 'ACCOMMODATION',
+    dateLabel: 'Cancelled',
+    date: '2025-07-01',
+    paymentMethod: 'CARD',
+    amount: 610,
+    status: 'CANCELLED',
+    travelers: 2
+  }
+];

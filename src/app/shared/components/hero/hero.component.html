@@ -1,0 +1,10 @@
+<section class="hero" [style.--parallax-y]="parallaxOffset() + 'px'">
+  <img class="background-image" [src]="image" alt="" fetchpriority="high" aria-hidden="true" />
+  <div class="veil"></div>
+  <div class="copy container">
+    <p class="eyebrow">Curated journeys</p>
+    <h1 class="display">Discover your next adventure</h1>
+    <p>Search destinations, lock dates, and book trips, stays, and activities in one pocket-sized plan.</p>
+    <app-search-bar [query]="query" (search)="search.emit($event)" />
+  </div>
+</section>

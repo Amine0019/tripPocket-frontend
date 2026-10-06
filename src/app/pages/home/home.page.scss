@@ -1,0 +1,45 @@
+.grid-dest {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.scroll-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  .scroll-reveal {
+    transition: opacity 650ms ease, transform 650ms cubic-bezier(0.2, 0.65, 0.3, 1);
+  }
+
+  app-trip-card.scroll-reveal:nth-child(2),
+  app-destination-card.scroll-reveal:nth-child(2),
+  app-activity-card.scroll-reveal:nth-child(2) {
+    transition-delay: 90ms;
+  }
+
+  app-trip-card.scroll-reveal:nth-child(3),
+  app-destination-card.scroll-reveal:nth-child(3),
+  app-activity-card.scroll-reveal:nth-child(3) {
+    transition-delay: 180ms;
+  }
+
+  app-destination-card.scroll-reveal:nth-child(4) {
+    transition-delay: 270ms;
+  }
+}
+
+@media (max-width: 1024px) {
+  .grid-dest { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .grid-dest { grid-template-columns: 1fr; }
+}

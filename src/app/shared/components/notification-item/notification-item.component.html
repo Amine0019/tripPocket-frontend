@@ -1,0 +1,8 @@
+<button class="item" [class.unread]="!item.read" type="button" (click)="read.emit(item.id)">
+  <span class="icon">{{ item.icon === 'check' ? '✓' : item.icon === 'calendar' ? '▦' : item.icon === 'card' ? '▭' : item.icon === 'plane' ? '✈' : '•' }}</span>
+  <div>
+    <strong>{{ item.title }}</strong>
+    <p>{{ item.message }}</p>
+    <small>{{ item.date }}</small>
+  </div>
+</button>

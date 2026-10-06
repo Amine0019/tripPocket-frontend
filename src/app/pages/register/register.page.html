@@ -1,0 +1,16 @@
+<section class="auth-wrap container">
+  <form class="card auth-card" (submit)="$event.preventDefault(); submit()">
+    <p class="eyebrow">Join tripPocket</p>
+    <h1 class="display">Create your account</h1>
+    <p class="muted">Save trips, book activities, and keep expenses in one place.</p>
+    <div class="stack">
+      <label class="field"><span>First name</span><input class="input" [(ngModel)]="firstName" name="first" /></label>
+      <label class="field"><span>Last name</span><input class="input" [(ngModel)]="lastName" name="last" /></label>
+      <label class="field"><span>Email</span><input class="input" type="email" [(ngModel)]="email" name="email" /></label>
+      <label class="field"><span>Password</span><input class="input" type="password" [(ngModel)]="password" name="password" /></label>
+      @if (error()) { <p class="err">{{ error() }}</p> }
+      <button class="btn btn-primary" type="submit">Register</button>
+      <p>Already a traveler? <a routerLink="/login">Log in</a></p>
+    </div>
+  </form>
+</section>

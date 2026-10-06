@@ -1,0 +1,25 @@
+<section class="page container">
+  <app-page-header eyebrow="Explore" title="Find your next trip" subtitle="Filter by destination, budget, duration, and travel style.">
+    <button class="btn btn-outline" type="button" (click)="filtersOpen.set(true)">Filters</button>
+  </app-page-header>
+
+  <app-search-bar [query]="query()" (search)="search($event)" />
+
+  <p class="muted count">{{ trips().length }} trips</p>
+
+  @if (trips().length) {
+    <div class="grid-3">
+      @for (trip of trips(); track trip.id) {
+        <app-trip-card [trip]="trip" />
+      }
+    </div>
+  } @else {
+    <app-empty-state title="No trips match" message="Try a different destination or clear a few filters." />
+  }
+</section>
+
+<app-filter-panel
+  [open]="filtersOpen()"
+  [filters]="filters()"
+  (filtersChange)="filters.set($event)"
+  (closed)="filtersOpen.set(false)" />

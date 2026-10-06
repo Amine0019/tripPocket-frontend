@@ -1,0 +1,62 @@
+<header class="nav">
+  <div class="nav-inner">
+    <a routerLink="/" class="brand" (click)="close()">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+          <path d="M12 21s7-6.2 7-11.2A7 7 0 0 0 5 9.8C5 14.8 12 21 12 21Z" fill="currentColor"/>
+          <circle cx="12" cy="9.5" r="2.3" fill="#fff"/>
+        </svg>
+      </span>
+      <span>tripPocket</span>
+    </a>
+
+    <nav class="links" [class.open]="menuOpen()">
+      @for (link of links; track link.path) {
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: link.exact }"
+          (click)="close()">{{ link.label }}</a>
+      }
+    </nav>
+
+    <div class="actions">
+      <button class="ghost" type="button" aria-label="Search" (click)="searchOpen.set(!searchOpen()); userMenu.set(false)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/>
+        </svg>
+      </button>
+      <a routerLink="/notifications" class="ghost bell" aria-label="Notifications" (click)="close()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 16v-5a6 6 0 1 0-12 0v5L4 18h16l-2-2Z"/><path d="M10 20a2 2 0 0 0 4 0"/>
+        </svg>
+        @if (unread()) {
+          <span class="dot"></span>
+        }
+      </a>
+      <button class="avatar" type="button" (click)="userMenu.set(!userMenu()); searchOpen.set(false)" [attr.aria-label]="user().firstName">
+        {{ user().avatarInitials }}
+      </button>
+      <button class="burger" type="button" aria-label="Menu" (click)="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  @if (searchOpen()) {
+    <form class="search-drop container" (submit)="$event.preventDefault(); submitSearch()">
+      <input class="input" [(ngModel)]="searchTerm" name="q" placeholder="Where do you want to go?" />
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+  }
+
+  @if (userMenu()) {
+    <div class="user-drop">
+      <p>{{ user().firstName }} {{ user().lastName }}</p>
+      <a routerLink="/profile" (click)="close()">Profile</a>
+      <a routerLink="/notifications" (click)="close()">Notifications</a>
+      <a routerLink="/my-trips" (click)="close()">My trips</a>
+      <a routerLink="/login" (click)="close()">Login</a>
+    </div>
+  }
+</header>

@@ -1,0 +1,30 @@
+@if (activity(); as activity) {
+  <section class="page container split-layout">
+    <div>
+      <img class="cover" [src]="activity.image" [alt]="activity.name" />
+      <p class="eyebrow">{{ activity.category }}</p>
+      <h1 class="display">{{ activity.name }}</h1>
+      <p>{{ activity.description }}</p>
+      <p class="muted">{{ activity.location }} · {{ activity.durationHours }} hours · ★ {{ activity.rating }}</p>
+      @if (relatedTrips().length) {
+        <h2>Goes well with</h2>
+        <ul>
+          @for (trip of relatedTrips(); track trip.id) {
+            <li><a [routerLink]="['/trips', trip.id]">{{ trip.title }}</a></li>
+          }
+        </ul>
+      }
+    </div>
+    <aside class="card book-card">
+      <strong>{{ activity.price | currency:'USD':'symbol':'1.0-0' }}</strong>
+      <p class="muted">per person</p>
+      <button class="btn btn-primary" type="button" (click)="addToTrip()">Add to my trip</button>
+      <a class="btn btn-outline" routerLink="/activities">All activities</a>
+    </aside>
+  </section>
+} @else {
+  <section class="page container">
+    <h1>Activity not found</h1>
+    <a routerLink="/activities">Back</a>
+  </section>
+}

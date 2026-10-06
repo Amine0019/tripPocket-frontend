@@ -1,0 +1,17 @@
+<article class="row">
+  <div class="icon">{{ reservation.type === 'ACCOMMODATION' ? '⌂' : reservation.type === 'TRANSPORT' ? '⌁' : reservation.type === 'ACTIVITY' ? '◇' : '✈' }}</div>
+  <div>
+    <strong>{{ reservation.title }}</strong>
+    <p>{{ reservation.tripTitle }}</p>
+  </div>
+  <div class="cell hide-sm"><span>Type</span><b>{{ typeLabel(reservation.type) }}</b></div>
+  <div class="cell hide-sm"><span>Date</span><b>{{ reservation.dateLabel }}</b></div>
+  <div class="cell"><span>Amount</span><b>{{ reservation.amount | currency:'USD':'symbol':'1.0-0' }}</b></div>
+  <app-status-badge [status]="reservation.status" [overlay]="false" />
+  <div class="acts">
+    <a [routerLink]="['/reservations', reservation.id]">View</a>
+    @if (reservation.status === 'PENDING' || reservation.status === 'CONFIRMED') {
+      <button type="button" (click)="cancel.emit(reservation.id)">Cancel</button>
+    }
+  </div>
+</article>

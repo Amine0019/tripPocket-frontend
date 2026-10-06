@@ -1,0 +1,59 @@
+@if (open) {
+  <div class="overlay" (click)="closed.emit()">
+    <aside class="panel" (click)="$event.stopPropagation()">
+      <h3>Filters</h3>
+      <label class="field">
+        <span>Destination</span>
+        <input class="input" [(ngModel)]="filters.destination" name="destination" placeholder="Any destination" />
+      </label>
+      <label class="field">
+        <span>Category</span>
+        <select class="input" [(ngModel)]="filters.category" name="category">
+          <option value="">All</option>
+          <option>Adventure</option>
+          <option>Culture</option>
+          <option>Food & wine</option>
+          <option>Nature</option>
+          <option>Relaxation</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Price</span>
+        <select class="input" [(ngModel)]="filters.price" name="price">
+          <option value="">Any</option>
+          <option value="1000">Under $1,000</option>
+          <option value="1500">Under $1,500</option>
+          <option value="2000">Under $2,000</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Duration</span>
+        <select class="input" [(ngModel)]="filters.duration" name="duration">
+          <option value="">Any</option>
+          <option value="5">Up to 5 days</option>
+          <option value="7">Up to 7 days</option>
+          <option value="10">Up to 10 days</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Status</span>
+        <select class="input" [(ngModel)]="filters.status" name="status">
+          <option value="">Any</option>
+          <option>PLANNED</option>
+          <option>CONFIRMED</option>
+          <option>ACTIVE</option>
+          <option>COMPLETED</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Sort</span>
+        <select class="input" [(ngModel)]="filters.sort" name="sort">
+          <option value="recommended">Recommended</option>
+          <option value="price-asc">Price Low to High</option>
+          <option value="price-desc">Price High to Low</option>
+        </select>
+      </label>
+      <button class="btn btn-primary" type="button" (click)="apply()">Apply filters</button>
+    </aside>
+  </div>
+}

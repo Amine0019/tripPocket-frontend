@@ -1,0 +1,8 @@
+<ol>
+  @for (label of steps; track label; let i = $index) {
+    <li [class.done]="step > i + 1" [class.current]="step === i + 1">
+      <span>{{ step > i + 1 ? '✓' : i + 1 }}</span>
+      {{ label }}
+    </li>
+  }
+</ol>

@@ -1,0 +1,45 @@
+<form class="bar" [class.compact]="compact" (submit)="$event.preventDefault(); submit()">
+  @if (!compact) {
+    <label>
+      <span>Destination</span>
+      <strong>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 21s7-7 7-11a7 7 0 1 0-14 0c0 4 7 11 7 11zm0-9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+        <input [(ngModel)]="query.destination" name="destination" placeholder="Where do you want to go?" />
+      </strong>
+    </label>
+    <label>
+      <span>Travel dates</span>
+      <strong>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+        <input [(ngModel)]="query.dates" name="dates" />
+      </strong>
+    </label>
+    <label>
+      <span>Travelers</span>
+      <strong>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 19a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2"/><path d="M17 13a5 5 0 0 1 4 6"/></svg>
+        <input [(ngModel)]="query.travelers" name="travelers" type="number" min="1" />
+      </strong>
+    </label>
+    <label>
+      <span>Budget</span>
+      <strong>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+        <input [(ngModel)]="query.budget" name="budget" />
+      </strong>
+    </label>
+  } @else {
+    <label class="wide">
+      <strong>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+        <input [(ngModel)]="query.destination" name="destination" placeholder="Where do you want to go?" />
+      </strong>
+    </label>
+  }
+  <button class="btn btn-primary" type="submit">
+    @if (!compact) {
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+    }
+    Search
+  </button>
+</form>

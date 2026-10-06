@@ -1,0 +1,35 @@
+import { Routes } from '@angular/router';
+import { HomePage } from './pages/home/home.page';
+import { ExploreTripsPage } from './pages/explore-trips/explore-trips.page';
+import { TripDetailsPage } from './pages/trip-details/trip-details.page';
+import { ActivitiesPage } from './pages/activities/activities.page';
+import { ActivityDetailsPage } from './pages/activity-details/activity-details.page';
+import { MyTripsPage } from './pages/my-trips/my-trips.page';
+import { ReservationsPage } from './pages/reservations/reservations.page';
+import { ReservationDetailsPage } from './pages/reservation-details/reservation-details.page';
+import { BookingPage } from './pages/booking/booking.page';
+import { ExpensesPage } from './pages/expenses/expenses.page';
+import { ProfilePage } from './pages/profile/profile.page';
+import { NotificationsPage } from './pages/notifications/notifications.page';
+import { LoginPage } from './pages/login/login.page';
+import { RegisterPage } from './pages/register/register.page';
+import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
+
+export const routes: Routes = [
+  { path: '', component: HomePage },
+  { path: 'trips', component: ExploreTripsPage },
+  { path: 'trips/:id', component: TripDetailsPage },
+  { path: 'activities', component: ActivitiesPage },
+  { path: 'activities/:id', component: ActivityDetailsPage },
+  { path: 'my-trips', component: MyTripsPage },
+  { path: 'reservations', component: ReservationsPage },
+  { path: 'reservations/:id', component: ReservationDetailsPage },
+  { path: 'booking/:tripId', component: BookingPage },
+  { path: 'expenses', component: ExpensesPage },
+  { path: 'profile', component: ProfilePage },
+  { path: 'notifications', component: NotificationsPage },
+  { path: 'login', component: LoginPage },
+  { path: 'register', component: RegisterPage },
+  { path: 'forgot-password', component: ForgotPasswordPage },
+  { path: '**', redirectTo: '' }
+];
