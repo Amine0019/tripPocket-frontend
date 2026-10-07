@@ -20,7 +20,7 @@ import { AdminDashboardPage } from './pages/admin/dashboard/admin-dashboard.page
 import { AdminUsersPage } from './pages/admin/users/admin-users.page';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'trips', pathMatch: 'full' },
   { path: 'trips', component: ExploreTripsPage, canActivate: [authGuard] },
   { path: 'trips/:id', component: TripDetailsPage, canActivate: [authGuard] },
   { path: 'activities', component: ActivitiesPage, canActivate: [authGuard] },
