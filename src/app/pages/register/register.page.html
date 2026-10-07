@@ -6,7 +6,7 @@
     <div class="stack">
       <label class="field"><span>First name</span><input class="input" [(ngModel)]="firstName" name="first" /></label>
       <label class="field"><span>Last name</span><input class="input" [(ngModel)]="lastName" name="last" /></label>
-      <label class="field"><span>Email</span><input class="input" type="email" [(ngModel)]="email" name="email" /></label>
+      <label class="field"><span>Email</span><input class="input" [(ngModel)]="email" name="email" /></label>
       <label class="field"><span>Password</span><input class="input" type="password" [(ngModel)]="password" name="password" /></label>
       @if (error()) { <p class="err">{{ error() }}</p> }
       <button class="btn btn-primary" type="submit" [disabled]="loading()">{{ loading() ? 'Creating account...' : 'Register' }}</button>

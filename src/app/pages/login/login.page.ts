@@ -30,11 +30,6 @@ export class LoginPage {
       return;
     }
 
-    if (!this.email.includes('@') || this.password.length < 4) {
-      this.error.set('Use a valid email and a password of at least 4 characters.');
-      return;
-    }
-
     this.error.set('');
     this.loading.set(true);
 
@@ -50,12 +45,23 @@ export class LoginPage {
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
-        this.error.set(
-          error.status === 401
-            ? 'Email ou mot de passe incorrect.'
-            : 'Unable to sign in right now. Please try again.'
-        );
+        this.error.set(this.getErrorMessage(error));
       }
     });
+  }
+
+  private getErrorMessage(error: HttpErrorResponse): string {
+    const validationErrors = error.error?.errors as Record<string, string> | undefined;
+    if (validationErrors) {
+      return Object.values(validationErrors).join(' ');
+    }
+
+    if (typeof error.error?.message === 'string') {
+      return error.error.message;
+    }
+
+    return error.status === 401
+      ? 'Email ou mot de passe incorrect.'
+      : 'Unable to sign in right now. Please try again.';
   }
 }

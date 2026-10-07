@@ -29,11 +29,6 @@ export class RegisterPage {
       return;
     }
 
-    if (!this.firstName || !this.lastName || !this.email.includes('@') || this.password.length < 4) {
-      this.error.set('Fill in your name, a valid email, and a password of at least 4 characters.');
-      return;
-    }
-
     this.error.set('');
     this.loading.set(true);
 
@@ -56,6 +51,15 @@ export class RegisterPage {
   }
 
   private getErrorMessage(error: HttpErrorResponse): string {
+    const validationErrors = error.error?.errors as Record<string, string> | undefined;
+    if (validationErrors) {
+      return Object.values(validationErrors).join(' ');
+    }
+
+    if (typeof error.error?.message === 'string') {
+      return error.error.message;
+    }
+
     switch (error.status) {
       case 409:
         return 'This email is already in use.';
