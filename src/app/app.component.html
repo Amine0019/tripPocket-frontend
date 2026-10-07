@@ -1,6 +1,8 @@
 <div class="app-shell">
-  <app-navbar />
-  <main class="app-main">
+  @if (showNavbar()) {
+    <app-navbar />
+  }
+  <main class="app-main" [class.auth-main]="!showNavbar()">
     <router-outlet />
   </main>
   <app-footer />
