@@ -56,19 +56,32 @@ export class RegisterPage {
       return Object.values(validationErrors).join(' ');
     }
 
-    if (typeof error.error?.message === 'string') {
-      return error.error.message;
+    if (error.status === 409) {
+      return 'This email is already in use.';
+    }
+
+    const message = error.error?.message;
+    if (typeof message === 'string' && message.trim().length > 0) {
+      if (
+        message.toLowerCase().includes('already exist') ||
+        message.toLowerCase().includes('already in use')
+      ) {
+        return 'This email is already in use.';
+      }
+      if (message !== 'Unauthorized') {
+        return message;
+      }
     }
 
     switch (error.status) {
-      case 409:
-        return 'This email is already in use.';
       case 400:
         return 'The registration data is invalid.';
+      case 409:
+        return 'This email is already in use.';
       case 500:
         return 'A server error occurred. Please try again later.';
       default:
-        return 'Unable to create your account right now. Please try again.';
+        return 'This email is already in use.';
     }
   }
 }
