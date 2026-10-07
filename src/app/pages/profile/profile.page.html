@@ -1,18 +1,15 @@
 <section class="page container">
   <app-page-header eyebrow="Account" title="Profile" subtitle="Manage the traveler details used across bookings." />
   <div class="split-layout">
-    <form class="card pad" (submit)="$event.preventDefault(); save()">
+    <form class="card pad" #profileForm="ngForm" (submit)="save(profileForm)">
       <div class="form-grid">
-        <label class="field"><span>First name</span><input class="input" [(ngModel)]="draft.firstName" name="first" /></label>
-        <label class="field"><span>Last name</span><input class="input" [(ngModel)]="draft.lastName" name="last" /></label>
-        <label class="field span-2"><span>Email</span><input class="input" [(ngModel)]="draft.email" name="email" /></label>
-        <label class="field"><span>Phone</span><input class="input" [(ngModel)]="draft.phone" name="phone" /></label>
-        <label class="field"><span>Country</span><input class="input" [(ngModel)]="draft.country" name="country" /></label>
-        <label class="field span-2"><span>Language</span><input class="input" [(ngModel)]="draft.language" name="language" /></label>
+        <label class="field"><span>First name</span><input class="input" [(ngModel)]="draft.firstName" name="first" required minlength="2" /></label>
+        <label class="field"><span>Last name</span><input class="input" [(ngModel)]="draft.lastName" name="last" required minlength="2" /></label>
+        <label class="field"><span>Email</span><input class="input" type="email" [(ngModel)]="draft.email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" /></label>
+        <label class="field"><span>New Password</span><input class="input" type="password" [(ngModel)]="draft.password" name="password" minlength="6" placeholder="Leave empty to keep current" /></label>
       </div>
       <div style="display:flex;gap:10px;margin-top:18px">
-        <button class="btn btn-primary" type="submit">Save changes</button>
-        <button class="btn btn-outline" type="button" (click)="logout()">Log out</button>
+        <button class="btn btn-primary" type="submit" [disabled]="profileForm.invalid">Save changes</button>
       </div>
     </form>
     <aside class="card pad">

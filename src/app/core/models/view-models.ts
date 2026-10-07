@@ -12,9 +12,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
-  country: string;
-  language: string;
+  password?: string;
   avatarInitials: string;
   memberSince: string;
   role: 'TRAVELER' | 'ADMIN';

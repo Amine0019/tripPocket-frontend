@@ -42,6 +42,7 @@ export class LoginPage {
           this.tokenService.saveRefreshToken(response.refreshToken);
         }
         this.store.updateUser({
+          id: response.id,
           firstName: response.firstName,
           lastName: response.lastName,
           email: response.username,
