@@ -1,0 +1,16 @@
+.placeholder-page {
+  padding: clamp(24px, 5vw, 56px);
+  border: 1px solid #e1ebe8;
+  border-radius: 18px;
+  background: #fff;
+}
+
+h2 {
+  margin: 8px 0;
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.muted {
+  margin: 0;
+}

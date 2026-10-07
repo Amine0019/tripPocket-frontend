@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { Role } from '../../shared/models/enums/role.enum';
 import { TokenService } from '../../core/services/token.service';
 import { ToastService } from '../../core/services/toast.service';
 
@@ -45,7 +46,7 @@ export class LoginPage {
         }
         this.loading.set(false);
         this.toast.show('Welcome back', 'Your trips and reservations are ready.');
-        void this.router.navigate(['/my-trips']);
+        void this.router.navigate(response.role === Role.ADMIN ? ['/admin'] : ['/my-trips']);
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);

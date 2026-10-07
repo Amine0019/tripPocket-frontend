@@ -15,6 +15,10 @@ import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
 import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { AdminLayoutComponent } from './pages/admin/layout/admin-layout.component';
+import { AdminDashboardPage } from './pages/admin/dashboard/admin-dashboard.page';
+import { AdminUsersPage } from './pages/admin/users/admin-users.page';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -29,6 +33,17 @@ export const routes: Routes = [
   { path: 'expenses', component: ExpensesPage, canActivate: [authGuard] },
   { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
   { path: 'notifications', component: NotificationsPage, canActivate: [authGuard] },
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ROLE_ADMIN'] },
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      { path: 'dashboard', component: AdminDashboardPage },
+      { path: 'users', component: AdminUsersPage }
+    ]
+  },
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegisterPage },
   { path: 'forgot-password', component: ForgotPasswordPage },
