@@ -21,36 +21,64 @@ export class ProfilePage {
   private readonly userService = inject(UserService);
 
   readonly user = this.store.user;
-  draft = { ...this.store.user() };
+  draft = { ...this.store.user(), password: '' };
   loading = signal(false);
+  errorList = signal<string[]>([]);
 
-  save(form: NgForm): void {
-    if (form.invalid || this.loading()) return;
+  save(): void {
+    if (this.loading()) return;
+    this.errorList.set([]);
     this.loading.set(true);
     
     const payload: any = {
-      firstName: this.draft.firstName,
-      lastName: this.draft.lastName,
-      email: this.draft.email
+      firstName: this.draft.firstName ? this.draft.firstName.trim() : '',
+      lastName: this.draft.lastName ? this.draft.lastName.trim() : '',
+      email: this.draft.email ? this.draft.email.trim() : ''
     };
-    if (this.draft.password) {
-      payload.password = this.draft.password;
+    if (this.draft.password && this.draft.password.trim().length > 0) {
+      payload.password = this.draft.password.trim();
     }
 
     this.userService.updateUser(this.draft.id, payload).subscribe({
       next: (updatedUser) => {
         this.store.updateUser({
           ...updatedUser,
-          avatarInitials: `${updatedUser.firstName[0] ?? ''}${updatedUser.lastName[0] ?? ''}`.toUpperCase()
+          avatarInitials: `${updatedUser.firstName?.[0] ?? ''}${updatedUser.lastName?.[0] ?? ''}`.toUpperCase()
         });
-        this.draft = { ...this.store.user() };
+        this.draft = { ...this.store.user(), password: '' };
         this.loading.set(false);
+        this.errorList.set([]);
         this.toast.show('Profile saved', 'Your traveler details were updated.');
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
-        this.toast.show('Error', error.error?.message || 'Unable to save profile');
+        this.parseBackendErrors(error);
       }
     });
+  }
+
+  private parseBackendErrors(error: HttpErrorResponse): void {
+    const list: string[] = [];
+    const validationErrors = error.error?.errors as Record<string, string> | undefined;
+
+    if (validationErrors && typeof validationErrors === 'object') {
+      Object.values(validationErrors).forEach((msg) => list.push(msg));
+    }
+
+    if (list.length === 0) {
+      const message = error.error?.message;
+      if (typeof message === 'string' && message.trim().length > 0) {
+        list.push(message);
+      } else if (error.status === 409) {
+        list.push('This email is already in use.');
+      } else if (error.status === 400) {
+        list.push('Validation failed. Please check your inputs.');
+      } else {
+        list.push('Unable to save profile. Please try again.');
+      }
+    }
+
+    this.errorList.set(list);
+    this.toast.show('Validation Error', list[0]);
   }
 }

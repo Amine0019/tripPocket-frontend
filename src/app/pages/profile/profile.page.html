@@ -1,15 +1,27 @@
 <section class="page container">
   <app-page-header eyebrow="Account" title="Profile" subtitle="Manage the traveler details used across bookings." />
   <div class="split-layout">
-    <form class="card pad" #profileForm="ngForm" (submit)="save(profileForm)">
+    <form class="card pad" (submit)="save()" novalidate>
+      @if (errorList().length > 0) {
+        <div class="error-alert">
+          <strong>Validation error:</strong>
+          <ul>
+            @for (err of errorList(); track err) {
+              <li>{{ err }}</li>
+            }
+          </ul>
+        </div>
+      }
       <div class="form-grid">
-        <label class="field"><span>First name</span><input class="input" [(ngModel)]="draft.firstName" name="first" required minlength="2" /></label>
-        <label class="field"><span>Last name</span><input class="input" [(ngModel)]="draft.lastName" name="last" required minlength="2" /></label>
-        <label class="field"><span>Email</span><input class="input" type="email" [(ngModel)]="draft.email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" /></label>
-        <label class="field"><span>New Password</span><input class="input" type="password" [(ngModel)]="draft.password" name="password" minlength="6" placeholder="Leave empty to keep current" /></label>
+        <label class="field"><span>First name</span><input class="input" [(ngModel)]="draft.firstName" name="first" /></label>
+        <label class="field"><span>Last name</span><input class="input" [(ngModel)]="draft.lastName" name="last" /></label>
+        <label class="field"><span>Email</span><input class="input" type="text" [(ngModel)]="draft.email" name="email" /></label>
+        <label class="field"><span>New Password</span><input class="input" type="password" [(ngModel)]="draft.password" name="password" placeholder="Leave empty to keep current" /></label>
       </div>
       <div style="display:flex;gap:10px;margin-top:18px">
-        <button class="btn btn-primary" type="submit" [disabled]="profileForm.invalid">Save changes</button>
+        <button class="btn btn-primary" type="submit" [disabled]="loading()">
+          @if (loading()) { Saving... } @else { Save changes }
+        </button>
       </div>
     </form>
     <aside class="card pad">
