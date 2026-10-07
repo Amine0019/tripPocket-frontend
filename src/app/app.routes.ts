@@ -18,6 +18,8 @@ import { roleGuard } from './core/guards/role.guard';
 import { AdminLayoutComponent } from './pages/admin/layout/admin-layout.component';
 import { AdminDashboardPage } from './pages/admin/dashboard/admin-dashboard.page';
 import { AdminUsersPage } from './pages/admin/users/admin-users.page';
+import { AdminUserFormPage } from './pages/admin/users/admin-user-form.page';
+import { AdminUserViewPage } from './pages/admin/users/admin-user-view.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'trips', pathMatch: 'full' },
@@ -40,7 +42,10 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: AdminDashboardPage },
-      { path: 'users', component: AdminUsersPage }
+      { path: 'users', component: AdminUsersPage },
+      { path: 'users/new', component: AdminUserFormPage },
+      { path: 'users/:id', component: AdminUserViewPage },
+      { path: 'users/:id/edit', component: AdminUserFormPage }
     ]
   },
   { path: 'login', component: LoginPage },
@@ -48,3 +53,4 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordPage },
   { path: '**', redirectTo: '' }
 ];
+

@@ -1,0 +1,92 @@
+<section class="view-section">
+
+  <!-- Header -->
+  <div class="view-header">
+    <a class="back-link" routerLink="/admin/users">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to users
+    </a>
+    <div class="header-row">
+      <h2>User details</h2>
+      @if (user()) {
+        <div class="header-actions">
+          <a class="btn btn-outline" [routerLink]="['/admin/users', userId, 'edit']">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit
+          </a>
+          <button class="btn btn-danger" type="button" (click)="deleteUser()">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+            </svg>
+            Delete
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading…</p>
+    </div>
+  }
+
+  <!-- User card -->
+  @if (!loading() && user()) {
+    <div class="user-card card">
+
+      <!-- Avatar row -->
+      <div class="avatar-row">
+        <div class="avatar">
+          {{ user()!.firstName[0] }}{{ user()!.lastName[0] }}
+        </div>
+        <div>
+          <h3>{{ user()!.firstName }} {{ user()!.lastName }}</h3>
+          <p class="email">{{ user()!.email }}</p>
+        </div>
+        <div class="badges">
+          <span class="badge" [class.badge-admin]="user()!.role === 'ADMIN'" [class.badge-traveler]="user()!.role === 'TRAVELER'">
+            {{ user()!.role }}
+          </span>
+          <span class="status-dot" [class.dot-on]="user()!.enabled" [class.dot-off]="!user()!.enabled">
+            {{ user()!.enabled ? 'Active' : 'Disabled' }}
+          </span>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Detail grid -->
+      <dl class="detail-grid">
+        <div class="detail-item">
+          <dt>ID</dt>
+          <dd>#{{ user()!.id }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt>First name</dt>
+          <dd>{{ user()!.firstName }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt>Last name</dt>
+          <dd>{{ user()!.lastName }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt>Email</dt>
+          <dd>{{ user()!.email }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt>Role</dt>
+          <dd>{{ user()!.role }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt>Status</dt>
+          <dd>{{ user()!.enabled ? 'Active' : 'Disabled' }}</dd>
+        </div>
+      </dl>
+    </div>
+  }
+</section>

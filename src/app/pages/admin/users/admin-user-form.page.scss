@@ -1,0 +1,124 @@
+.form-section {
+  animation: fadeUp 0.4s ease both;
+}
+
+.form-header {
+  margin-bottom: 28px;
+
+  h2 {
+    margin: 10px 0 4px;
+    font-family: var(--serif);
+    font-size: clamp(26px, 3vw, 36px);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .muted { margin: 0; font-size: 14px; }
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity 0.15s ease;
+
+  &:hover { opacity: 0.75; }
+}
+
+// ── Form card ─────────────────────────────────────────────────────
+.user-form {
+  padding: 32px;
+  max-width: 640px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.span-2 { grid-column: 1 / -1; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+}
+
+.required {
+  font-style: normal;
+  color: var(--coral-bright);
+  margin-left: 2px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+// ── Error alert ───────────────────────────────────────────────────
+.error-alert {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+
+  strong {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
+
+    li {
+      margin-bottom: 3px;
+      &:last-child { margin-bottom: 0; }
+    }
+  }
+}
+
+// ── Loading ───────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #e6eeec;
+  border-top-color: var(--teal);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .user-form { padding: 20px; }
+}

@@ -1,0 +1,90 @@
+<section class="form-section">
+
+  <!-- Header -->
+  <div class="form-header">
+    <a class="back-link" routerLink="/admin/users">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to users
+    </a>
+    <h2>{{ isEdit() ? 'Edit user' : 'Create user' }}</h2>
+    <p class="muted">{{ isEdit() ? 'Update the fields below and save.' : 'Fill in the fields below to create a new account.' }}</p>
+  </div>
+
+  <!-- Loading skeleton -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading user…</p>
+    </div>
+  }
+
+  <!-- Form -->
+  @if (!loading()) {
+    <form class="user-form card" (submit)="$event.preventDefault(); save()" novalidate>
+
+      <!-- Validation errors from backend -->
+      @if (errorList().length > 0) {
+        <div class="error-alert" role="alert">
+          <strong>Validation error</strong>
+          <ul>
+            @for (err of errorList(); track err) {
+              <li>{{ err }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="form-grid">
+        <!-- First name -->
+        <label class="field">
+          <span>First name <em class="required">*</em></span>
+          <input class="input" type="text" [(ngModel)]="draft.firstName" name="firstName" autocomplete="given-name" />
+        </label>
+
+        <!-- Last name -->
+        <label class="field">
+          <span>Last name <em class="required">*</em></span>
+          <input class="input" type="text" [(ngModel)]="draft.lastName" name="lastName" autocomplete="family-name" />
+        </label>
+
+        <!-- Email -->
+        <label class="field span-2">
+          <span>Email <em class="required">*</em></span>
+          <input class="input" type="text" [(ngModel)]="draft.email" name="email" autocomplete="email" />
+        </label>
+
+        <!-- Password -->
+        <label class="field span-2">
+          <span>Password {{ isEdit() ? '(leave empty to keep current)' : '' }} <em class="required">{{ isEdit() ? '' : '*' }}</em></span>
+          <input class="input" type="password" [(ngModel)]="draft.password" name="password"
+            [placeholder]="isEdit() ? 'At least 8 characters (or leave empty)' : 'At least 8 characters'" />
+        </label>
+
+        <!-- Role -->
+        <label class="field">
+          <span>Role</span>
+          <select class="input" [(ngModel)]="draft.role" name="role">
+            <option value="TRAVELER">TRAVELER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </label>
+
+        <!-- Enabled -->
+        <label class="field">
+          <span>Status</span>
+          <select class="input" [(ngModel)]="draft.enabled" name="enabled">
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Disabled</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn btn-outline" routerLink="/admin/users">Cancel</a>
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          @if (saving()) { Saving… } @else { {{ isEdit() ? 'Save changes' : 'Create user' }} }
+        </button>
+      </div>
+    </form>
+  }
+</section>
