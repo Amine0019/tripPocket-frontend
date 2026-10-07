@@ -22,6 +22,7 @@ export class RegisterPage {
   email = '';
   password = '';
   error = signal('');
+  errorList = signal<string[]>([]);
   loading = signal(false);
 
   submit(): void {
@@ -30,13 +31,14 @@ export class RegisterPage {
     }
 
     this.error.set('');
+    this.errorList.set([]);
     this.loading.set(true);
 
     this.authService.register({
-      firstName: this.firstName,
-      lastName: this.lastName,
-      email: this.email,
-      password: this.password
+      firstName: this.firstName ? this.firstName.trim() : '',
+      lastName: this.lastName ? this.lastName.trim() : '',
+      email: this.email ? this.email.trim() : '',
+      password: this.password ? this.password.trim() : ''
     }).subscribe({
       next: () => {
         this.loading.set(false);
@@ -45,43 +47,42 @@ export class RegisterPage {
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
-        this.error.set(this.getErrorMessage(error));
+        this.parseBackendErrors(error);
       }
     });
   }
 
-  private getErrorMessage(error: HttpErrorResponse): string {
+  private parseBackendErrors(error: HttpErrorResponse): void {
+    const list: string[] = [];
     const validationErrors = error.error?.errors as Record<string, string> | undefined;
-    if (validationErrors) {
-      return Object.values(validationErrors).join(' ');
+
+    if (validationErrors && typeof validationErrors === 'object') {
+      Object.values(validationErrors).forEach((msg) => list.push(msg));
     }
 
-    if (error.status === 409) {
-      return 'This email is already in use.';
-    }
-
-    const message = error.error?.message;
-    if (typeof message === 'string' && message.trim().length > 0) {
-      if (
-        message.toLowerCase().includes('already exist') ||
-        message.toLowerCase().includes('already in use')
-      ) {
-        return 'This email is already in use.';
+    if (list.length === 0) {
+      if (error.status === 409) {
+        list.push('This email is already in use.');
+      } else {
+        const message = error.error?.message;
+        if (typeof message === 'string' && message.trim().length > 0 && message !== 'Unauthorized') {
+          if (
+            message.toLowerCase().includes('already exist') ||
+            message.toLowerCase().includes('already in use')
+          ) {
+            list.push('This email is already in use.');
+          } else {
+            list.push(message);
+          }
+        } else if (error.status === 400) {
+          list.push('The registration data is invalid.');
+        } else {
+          list.push('An error occurred during registration. Please try again.');
+        }
       }
-      if (message !== 'Unauthorized') {
-        return message;
-      }
     }
 
-    switch (error.status) {
-      case 400:
-        return 'The registration data is invalid.';
-      case 409:
-        return 'This email is already in use.';
-      case 500:
-        return 'A server error occurred. Please try again later.';
-      default:
-        return 'This email is already in use.';
-    }
+    this.errorList.set(list);
+    this.error.set(list.join(' '));
   }
 }

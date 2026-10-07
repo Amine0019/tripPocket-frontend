@@ -1,14 +1,23 @@
 <section class="auth-wrap container">
-  <form class="card auth-card" (submit)="$event.preventDefault(); submit()">
+  <form class="card auth-card" (submit)="$event.preventDefault(); submit()" novalidate>
     <p class="eyebrow">Join tripPocket</p>
     <h1 class="display">Create your account</h1>
     <p class="muted">Save trips, book activities, and keep expenses in one place.</p>
     <div class="stack">
+      @if (errorList().length > 0) {
+        <div class="error-alert">
+          <strong>Validation error:</strong>
+          <ul>
+            @for (err of errorList(); track err) {
+              <li>{{ err }}</li>
+            }
+          </ul>
+        </div>
+      }
       <label class="field"><span>First name</span><input class="input" [(ngModel)]="firstName" name="first" /></label>
       <label class="field"><span>Last name</span><input class="input" [(ngModel)]="lastName" name="last" /></label>
       <label class="field"><span>Email</span><input class="input" [(ngModel)]="email" name="email" /></label>
-      <label class="field"><span>Password</span><input class="input" type="password" [(ngModel)]="password" name="password" /></label>
-      @if (error()) { <p class="err">{{ error() }}</p> }
+      <label class="field"><span>Password</span><input class="input" type="password" [(ngModel)]="password" name="password" placeholder="At least 8 characters" /></label>
       <button class="btn btn-primary" type="submit" [disabled]="loading()">{{ loading() ? 'Creating account...' : 'Register' }}</button>
       <p>Already a traveler? <a routerLink="/login">Log in</a></p>
     </div>

@@ -16,7 +16,7 @@
         <label class="field"><span>First name</span><input class="input" [(ngModel)]="draft.firstName" name="first" /></label>
         <label class="field"><span>Last name</span><input class="input" [(ngModel)]="draft.lastName" name="last" /></label>
         <label class="field"><span>Email</span><input class="input" type="text" [(ngModel)]="draft.email" name="email" /></label>
-        <label class="field"><span>New Password</span><input class="input" type="password" [(ngModel)]="draft.password" name="password" placeholder="Leave empty to keep current" /></label>
+        <label class="field"><span>New Password</span><input class="input" type="password" [(ngModel)]="draft.password" name="password" placeholder="At least 8 characters (or leave empty)" /></label>
       </div>
       <div style="display:flex;gap:10px;margin-top:18px">
         <button class="btn btn-primary" type="submit" [disabled]="loading()">
