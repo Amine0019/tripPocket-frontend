@@ -1,0 +1,6 @@
+export enum ActivityCategory {
+  SIGHTSEEING = 'SIGHTSEEING',
+  RESTAURANT = 'RESTAURANT',
+  TRANSPORT = 'TRANSPORT',
+  LEISURE = 'LEISURE'
+}

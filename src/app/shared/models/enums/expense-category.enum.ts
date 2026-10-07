@@ -1,0 +1,7 @@
+export enum ExpenseCategory {
+  ACCOMMODATION = 'ACCOMMODATION',
+  FOOD = 'FOOD',
+  TRANSPORT = 'TRANSPORT',
+  ACTIVITIES = 'ACTIVITIES',
+  OTHER = 'OTHER'
+}
