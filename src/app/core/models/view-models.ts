@@ -14,7 +14,7 @@ export interface User {
   email: string;
   password?: string;
   avatarInitials: string;
-  memberSince: string;
+  memberSince?: string;
   role: 'TRAVELER' | 'ADMIN';
 }
 
