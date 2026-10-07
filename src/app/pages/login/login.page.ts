@@ -72,7 +72,7 @@ export class LoginPage {
     }
 
     return error.status === 401
-      ? 'Email ou mot de passe incorrect.'
+      ? 'Invalid credentials.'
       : 'Unable to sign in right now. Please try again.';
   }
 }
