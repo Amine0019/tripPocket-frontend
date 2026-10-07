@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { TokenService } from '../../core/services/token.service';
 import { ToastService } from '../../core/services/toast.service';
 
 @Component({
@@ -14,6 +15,7 @@ import { ToastService } from '../../core/services/toast.service';
 })
 export class LoginPage {
   private readonly authService = inject(AuthService);
+  private readonly tokenService = inject(TokenService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -36,7 +38,11 @@ export class LoginPage {
     this.loading.set(true);
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: () => {
+      next: (response) => {
+        this.tokenService.saveAccessToken(response.accessToken);
+        if (response.refreshToken) {
+          this.tokenService.saveRefreshToken(response.refreshToken);
+        }
         this.loading.set(false);
         this.toast.show('Welcome back', 'Your trips and reservations are ready.');
         void this.router.navigate(['/my-trips']);
