@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../shared/models/enums/role.enum';
 import { TokenService } from '../../core/services/token.service';
 import { ToastService } from '../../core/services/toast.service';
+import { TravelStore } from '../../core/services/travel.store';
 
 @Component({
   selector: 'app-login-page',
@@ -18,6 +19,7 @@ export class LoginPage {
   private readonly authService = inject(AuthService);
   private readonly tokenService = inject(TokenService);
   private readonly toast = inject(ToastService);
+  private readonly store = inject(TravelStore);
   private readonly router = inject(Router);
 
   email = '';
@@ -39,6 +41,14 @@ export class LoginPage {
         if (response.refreshToken) {
           this.tokenService.saveRefreshToken(response.refreshToken);
         }
+        this.store.updateUser({
+          firstName: response.firstName,
+          lastName: response.lastName,
+          email: response.username,
+          avatarInitials: `${response.firstName[0]}${response.lastName[0]}`.toUpperCase(),
+          role: response.role === Role.ADMIN ? 'ADMIN' : 'TRAVELER'
+        });
+        this.store.loggedIn.set(true);
         this.loading.set(false);
         this.toast.show('Welcome back', 'Your trips and reservations are ready.');
         void this.router.navigate(response.role === Role.ADMIN ? ['/admin'] : ['/my-trips']);

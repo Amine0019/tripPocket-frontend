@@ -26,7 +26,7 @@ export class TravelStore {
   readonly reservations = signal<Reservation[]>(MOCK_RESERVATIONS);
   readonly expenses = signal<BudgetExpense[]>(MOCK_EXPENSES);
   readonly notifications = signal<AppNotification[]>(MOCK_NOTIFICATIONS);
-  readonly user = signal<User>({ ...MOCK_USER });
+  readonly user = signal<User>(this.loadInitialUser());
   readonly favorites = signal<string[]>(['japan']);
   readonly lastSearch = signal<SearchQuery>({
     destination: '',
@@ -34,7 +34,19 @@ export class TravelStore {
     travelers: 2,
     budget: '$500 – $2,000'
   });
-  readonly loggedIn = signal(true);
+  readonly loggedIn = signal(localStorage.getItem('trippocket_access_token') !== null || localStorage.getItem('trippocket_user') !== null);
+
+  private loadInitialUser(): User {
+    const saved = localStorage.getItem('trippocket_user');
+    if (saved) {
+      try {
+        return JSON.parse(saved) as User;
+      } catch {
+        // fallback
+      }
+    }
+    return { ...MOCK_USER };
+  }
 
   tripById(id: string): Trip | undefined {
     return this.trips().find((trip) => trip.id === id);
@@ -132,10 +144,16 @@ export class TravelStore {
 
   logout(): void {
     this.loggedIn.set(false);
+    localStorage.removeItem('trippocket_user');
+    this.user.set({ ...MOCK_USER });
   }
 
   updateUser(patch: Partial<User>): void {
-    this.user.update((current) => ({ ...current, ...patch }));
+    this.user.update((current) => {
+      const updated = { ...current, ...patch };
+      localStorage.setItem('trippocket_user', JSON.stringify(updated));
+      return updated;
+    });
   }
 
   categoryTotals(): Record<ExpenseCategory, number> {

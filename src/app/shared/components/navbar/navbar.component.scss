@@ -169,6 +169,22 @@
   color: var(--teal);
 }
 
+.logout-btn {
+  border: 0;
+  background: transparent;
+  color: #e53e3e;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  padding: 4px 0 0 0;
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #c53030;
+  }
+}
+
 @media (max-width: 1024px) {
   .links {
     display: none;
