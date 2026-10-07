@@ -1,8 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
-import { TravelStore } from '../../core/services/travel.store';
 
 @Component({
   selector: 'app-login-page',
@@ -12,20 +13,42 @@ import { TravelStore } from '../../core/services/travel.store';
   styleUrl: './login.page.scss'
 })
 export class LoginPage {
-  private readonly store = inject(TravelStore);
+  private readonly authService = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
   email = 'alex.morgan@email.com';
   password = 'travel';
   error = signal('');
+  loading = signal(false);
 
   submit(): void {
-    if (this.store.login(this.email, this.password)) {
-      this.toast.show('Welcome back', 'Your trips and reservations are ready.');
-      void this.router.navigate(['/my-trips']);
+    if (this.loading()) {
       return;
     }
-    this.error.set('Use a valid email and a password of at least 4 characters.');
+
+    if (!this.email.includes('@') || this.password.length < 4) {
+      this.error.set('Use a valid email and a password of at least 4 characters.');
+      return;
+    }
+
+    this.error.set('');
+    this.loading.set(true);
+
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.toast.show('Welcome back', 'Your trips and reservations are ready.');
+        void this.router.navigate(['/my-trips']);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loading.set(false);
+        this.error.set(
+          error.status === 401
+            ? 'Email ou mot de passe incorrect.'
+            : 'Unable to sign in right now. Please try again.'
+        );
+      }
+    });
   }
 }
