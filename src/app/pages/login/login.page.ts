@@ -20,8 +20,8 @@ export class LoginPage {
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
-  email = 'alex.morgan@email.com';
-  password = 'travel';
+  email = '';
+  password = '';
   error = signal('');
   loading = signal(false);
 
