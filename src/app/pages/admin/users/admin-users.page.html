@@ -170,7 +170,50 @@
         </tbody>
       </table>
     </div>
-    <p class="table-count">{{ allUsers().length }} user{{ allUsers().length === 1 ? '' : 's' }}</p>
+
+    <!-- Pagination bar -->
+    <div class="pagination-bar">
+      <div class="pagination-info">
+        <span class="range-text">
+          Showing <strong>{{ showingRange.start }}</strong>–<strong>{{ showingRange.end }}</strong> of <strong>{{ totalElements() }}</strong> users
+        </span>
+        <div class="page-size-wrap">
+          <label for="page-size-select">Per page:</label>
+          <select id="page-size-select" class="page-size-select" [value]="pageSize()" (change)="changePageSize($event)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <nav class="pagination-nav" aria-label="Pagination">
+        <button type="button" class="page-btn page-btn-prev" [disabled]="isFirstPage()" (click)="prevPage()" title="Previous page">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span>Prev</span>
+        </button>
+
+        <div class="page-numbers">
+          @for (p of pageNumbers; track p) {
+            <button type="button"
+                    class="page-number-btn"
+                    [class.active]="p === currentPage()"
+                    (click)="goToPage(p)">
+              {{ p + 1 }}
+            </button>
+          }
+        </div>
+
+        <button type="button" class="page-btn page-btn-next" [disabled]="isLastPage()" (click)="nextPage()" title="Next page">
+          <span>Next</span>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
   }
 
   <!-- Table — search results mode (no id, no actions) -->

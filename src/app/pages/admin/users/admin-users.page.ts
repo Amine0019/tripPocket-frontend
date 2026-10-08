@@ -29,6 +29,15 @@ export class AdminUsersPage implements OnInit, OnDestroy {
   activeRoleFilter = signal<'TRAVELER' | 'ADMIN' | null>(null);
   error            = signal('');
 
+  // ── Pagination State ─────────────────────────────────────────────
+  currentPage      = signal<number>(0);
+  pageSize         = signal<number>(10);
+  totalPages       = signal<number>(0);
+  totalElements    = signal<number>(0);
+  isFirstPage      = signal<boolean>(true);
+  isLastPage       = signal<boolean>(true);
+  readonly pageSizeOptions = [5, 10, 20, 50];
+
   // ── Search form (email only) ─────────────────────────────────────
   searchForm = new FormGroup({
     email: new FormControl(''),
@@ -45,13 +54,19 @@ export class AdminUsersPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ── Load all users (initial load) ───────────────────────────────
-  loadUsers(): void {
+  // ── Load users (paginated) ───────────────────────────────────────
+  loadUsers(page: number = this.currentPage(), size: number = this.pageSize()): void {
     this.loading.set(true);
     this.error.set('');
-    this.userService.getAllUsers().subscribe({
-      next: (data) => {
-        this.allUsers.set(data);
+    this.userService.getAllUsers(page, size).subscribe({
+      next: (response) => {
+        this.allUsers.set(response.content);
+        this.currentPage.set(response.pageNumber);
+        this.pageSize.set(response.pageSize);
+        this.totalPages.set(response.totalPages);
+        this.totalElements.set(response.totalElements);
+        this.isFirstPage.set(response.first);
+        this.isLastPage.set(response.last);
         this.loading.set(false);
       },
       error: () => {
@@ -141,6 +156,55 @@ export class AdminUsersPage implements OnInit, OnDestroy {
     this.searchForm.reset({ email: '' }, { emitEvent: false });
   }
 
+  // ── Pagination Navigation ──────────────────────────────────────
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages() && page !== this.currentPage()) {
+      this.loadUsers(page, this.pageSize());
+    }
+  }
+
+  prevPage(): void {
+    if (!this.isFirstPage()) {
+      this.goToPage(this.currentPage() - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (!this.isLastPage()) {
+      this.goToPage(this.currentPage() + 1);
+    }
+  }
+
+  changePageSize(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const newSize = Number(target.value);
+    if (!isNaN(newSize) && newSize > 0) {
+      this.pageSize.set(newSize);
+      this.loadUsers(0, newSize);
+    }
+  }
+
+  get pageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 1) return [0];
+
+    const delta = 2;
+    const range: number[] = [];
+    for (let i = Math.max(0, current - delta); i <= Math.min(total - 1, current + delta); i++) {
+      range.push(i);
+    }
+    return range;
+  }
+
+  get showingRange(): { start: number; end: number } {
+    const total = this.totalElements();
+    if (total === 0) return { start: 0, end: 0 };
+    const start = this.currentPage() * this.pageSize() + 1;
+    const end = Math.min((this.currentPage() + 1) * this.pageSize(), total);
+    return { start, end };
+  }
+
   // ── Navigation ───────────────────────────────────────────────────
   viewUser(id: number): void {
     void this.router.navigate(['/admin/users', id]);
@@ -175,8 +239,12 @@ export class AdminUsersPage implements OnInit, OnDestroy {
 
     this.userService.deleteUser(user.id).subscribe({
       next: () => {
-        this.allUsers.update((list) => list.filter((u) => u.id !== user.id));
         this.toast.show('User deleted', `${user.firstName} ${user.lastName} has been removed.`);
+        // Reload current page or previous page if last element was deleted
+        const targetPage = this.allUsers().length === 1 && this.currentPage() > 0
+          ? this.currentPage() - 1
+          : this.currentPage();
+        this.loadUsers(targetPage, this.pageSize());
       },
       error: (err) => {
         const msg = err.error?.message || 'Failed to delete user.';

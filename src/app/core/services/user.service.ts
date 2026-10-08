@@ -36,6 +36,16 @@ export interface UserSearchCriteria {
   email?: string;
 }
 
+export interface PageResponse<T> {
+  content: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -49,8 +59,11 @@ export class UserService {
   }
 
   // ── Admin CRUD ──────────────────────────────────────────────────
-  getAllUsers(): Observable<AdminUser[]> {
-    return this.http.get<AdminUser[]>(this.apiUrl);
+  getAllUsers(page: number = 0, size: number = 10): Observable<PageResponse<AdminUser>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<PageResponse<AdminUser>>(this.apiUrl, { params });
   }
 
   getUserById(id: number): Observable<AdminUser> {
