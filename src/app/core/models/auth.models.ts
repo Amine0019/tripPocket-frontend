@@ -3,6 +3,7 @@ import { Role } from '../../shared/models/enums/role.enum';
 export interface LoginRequest {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 export interface RegisterRequest {

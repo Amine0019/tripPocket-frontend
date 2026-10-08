@@ -15,6 +15,20 @@
         <input class="input" type="password" [(ngModel)]="password" name="password" [disabled]="loading() || googleLoading()" autocomplete="current-password" required />
       </label>
 
+      <div class="remember-row">
+        <label class="remember-label">
+          <input
+            type="checkbox"
+            class="checkbox-input"
+            [(ngModel)]="rememberMe"
+            name="rememberMe"
+            [disabled]="loading() || googleLoading()"
+          />
+          <span>Remember me</span>
+        </label>
+        <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
+      </div>
+
       @if (error()) {
         <p class="err">{{ error() }}</p>
       }

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TravelStore } from '../../../core/services/travel.store';
 import { TokenService } from '../../../core/services/token.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -14,6 +15,7 @@ import { TokenService } from '../../../core/services/token.service';
 export class NavbarComponent {
   private readonly store = inject(TravelStore);
   private readonly tokenService = inject(TokenService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly menuOpen = signal(false);
@@ -44,6 +46,11 @@ export class NavbarComponent {
 
   logout(): void {
     this.close();
+    const refreshToken = this.tokenService.getRefreshToken() || '';
+    this.authService.logout(refreshToken).subscribe({
+      next: () => {},
+      error: () => {}
+    });
     this.tokenService.clearTokens();
     this.store.logout();
     void this.router.navigate(['/login']);

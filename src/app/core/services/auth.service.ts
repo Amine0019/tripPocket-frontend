@@ -18,15 +18,23 @@ export class AuthService {
   private readonly apiUrl = environment.apiUrl;
 
   login(request: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, request);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, request, { withCredentials: true });
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, request);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, request, { withCredentials: true });
   }
 
-  refresh(request: RefreshRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/refresh`, request);
+  refresh(request?: RefreshRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/refresh`, request || {}, { withCredentials: true });
+  }
+
+  logout(refreshToken?: string): Observable<AuthMessageResponse> {
+    return this.http.post<AuthMessageResponse>(
+      `${this.apiUrl}/auth/logout`,
+      { refreshToken: refreshToken || '' },
+      { withCredentials: true }
+    );
   }
 
   forgotPassword(request: ForgotPasswordRequest): Observable<AuthMessageResponse> {
@@ -38,6 +46,6 @@ export class AuthService {
   }
 
   loginWithGoogle(credential: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/google`, { credential });
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/google`, { credential }, { withCredentials: true });
   }
 }

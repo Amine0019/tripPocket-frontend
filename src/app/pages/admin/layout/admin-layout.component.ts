@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TokenService } from '../../../core/services/token.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -12,6 +13,7 @@ import { TokenService } from '../../../core/services/token.service';
 export class AdminLayoutComponent {
   private readonly router = inject(Router);
   private readonly tokenService = inject(TokenService);
+  private readonly authService = inject(AuthService);
 
   readonly sidebarOpen = signal(false);
 
@@ -24,6 +26,11 @@ export class AdminLayoutComponent {
   }
 
   logout(): void {
+    const refreshToken = this.tokenService.getRefreshToken() || '';
+    this.authService.logout(refreshToken).subscribe({
+      next: () => {},
+      error: () => {}
+    });
     this.tokenService.clearTokens();
     void this.router.navigate(['/login']);
   }

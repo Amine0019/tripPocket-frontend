@@ -40,6 +40,7 @@ export class LoginPage implements AfterViewInit, OnDestroy {
 
   email = '';
   password = '';
+  rememberMe = false;
   error = signal('');
   loading = signal(false);
   googleLoading = signal(false);
@@ -97,7 +98,11 @@ export class LoginPage implements AfterViewInit, OnDestroy {
     this.error.set('');
     this.loading.set(true);
 
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
+    this.authService.login({
+      email: this.email,
+      password: this.password,
+      rememberMe: this.rememberMe
+    }).subscribe({
       next: (response) => {
         this.loading.set(false);
         this.handleAuthSuccess(response, 'Welcome back');
