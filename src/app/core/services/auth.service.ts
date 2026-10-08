@@ -36,4 +36,8 @@ export class AuthService {
   resetPassword(request: ResetPasswordRequest): Observable<AuthMessageResponse> {
     return this.http.post<AuthMessageResponse>(`${this.apiUrl}/auth/reset-password`, request);
   }
+
+  loginWithGoogle(credential: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/google`, { credential });
+  }
 }

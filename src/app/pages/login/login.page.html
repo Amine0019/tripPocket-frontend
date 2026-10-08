@@ -3,13 +3,43 @@
     <p class="eyebrow">tripPocket</p>
     <h1 class="display">Welcome back</h1>
     <p class="muted">Sign in to manage trips, reservations, and expenses.</p>
+    
     <div class="stack">
-      <label class="field"><span>Email</span><input class="input" [(ngModel)]="email" name="email" /></label>
-      <label class="field"><span>Password</span><input class="input" type="password" [(ngModel)]="password" name="password" /></label>
-      @if (error()) { <p class="err">{{ error() }}</p> }
-      <button class="btn btn-primary" type="submit" [disabled]="loading()">{{ loading() ? 'Signing in...' : 'Log in' }}</button>
-      <a routerLink="/forgot-password">Forgot password?</a>
-      <p>New here? <a routerLink="/register">Create an account</a></p>
+      <label class="field">
+        <span>Email</span>
+        <input class="input" type="email" [(ngModel)]="email" name="email" [disabled]="loading() || googleLoading()" autocomplete="email" required />
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input class="input" type="password" [(ngModel)]="password" name="password" [disabled]="loading() || googleLoading()" autocomplete="current-password" required />
+      </label>
+
+      @if (error()) {
+        <p class="err">{{ error() }}</p>
+      }
+
+      <button class="btn btn-primary" type="submit" [disabled]="loading() || googleLoading()">
+        {{ loading() ? 'Signing in...' : 'Log in' }}
+      </button>
+
+      <div class="auth-divider">
+        <span>OR</span>
+      </div>
+
+      <div class="google-auth-section">
+        <div #googleBtnContainer id="google-btn-container" class="google-btn-wrapper"></div>
+        @if (googleLoading()) {
+          <div class="google-loading-badge">
+            <span class="spinner-inline"></span> Connecting with Google...
+          </div>
+        }
+      </div>
+
+      <div class="auth-aux-links">
+        <a routerLink="/forgot-password">Forgot password?</a>
+        <p>New here? <a routerLink="/register">Create an account</a></p>
+      </div>
     </div>
   </form>
 </section>

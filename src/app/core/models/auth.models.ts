@@ -39,3 +39,7 @@ export interface ResetPasswordRequest {
 export interface AuthMessageResponse {
   message: string;
 }
+
+export interface GoogleLoginRequest {
+  credential: string;
+}
