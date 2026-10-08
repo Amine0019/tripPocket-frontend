@@ -13,6 +13,7 @@ import { NotificationsPage } from './pages/notifications/notifications.page';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
+import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { AdminLayoutComponent } from './pages/admin/layout/admin-layout.component';
@@ -51,6 +52,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegisterPage },
   { path: 'forgot-password', component: ForgotPasswordPage },
+  { path: 'reset-password', component: ResetPasswordPage },
   { path: '**', redirectTo: '' }
 ];
 
