@@ -28,6 +28,11 @@ export class AppComponent {
 
   private isAuthRoute(url: string): boolean {
     const path = url.split('?')[0];
-    return path === '/login' || path === '/register';
+    return (
+      path === '/login' ||
+      path === '/register' ||
+      path === '/forgot-password' ||
+      path === '/reset-password'
+    );
   }
 }
