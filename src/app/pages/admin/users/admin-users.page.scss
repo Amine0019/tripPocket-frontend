@@ -24,6 +24,81 @@
   font-size: 14px;
 }
 
+// ── Role filter bar ───────────────────────────────────────────────
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #dce8e5;
+  background: #f3f7f6;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: #eaf5f2;
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  &.chip-active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(27, 124, 110, 0.25);
+  }
+
+  // Admin chip active = orange
+  &:last-child.chip-active {
+    background: #c4652a;
+    border-color: #c4652a;
+    box-shadow: 0 2px 8px rgba(196, 101, 42, 0.25);
+  }
+}
+
+.btn-clear-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid #fca5a5;
+  background: #fef2f2;
+  color: #c0392b;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover { background: #fee2e2; }
+}
+
 // ── Search bar ────────────────────────────────────────────────────
 .search-bar {
   margin-bottom: 24px;

@@ -21,12 +21,13 @@ export class AdminUsersPage implements OnInit, OnDestroy {
   private readonly destroy$     = new Subject<void>();
 
   // ── State ────────────────────────────────────────────────────────
-  allUsers      = signal<AdminUser[]>([]);
-  searchResults = signal<UserSearchResult[]>([]);
-  loading       = signal(true);
-  searching     = signal(false);
-  isSearchMode  = signal(false);
-  error         = signal('');
+  allUsers         = signal<AdminUser[]>([]);
+  searchResults    = signal<UserSearchResult[]>([]);
+  loading          = signal(true);
+  searching        = signal(false);
+  isSearchMode     = signal(false);
+  activeRoleFilter = signal<'TRAVELER' | 'ADMIN' | null>(null);
+  error            = signal('');
 
   // ── Search form (email only) ─────────────────────────────────────
   searchForm = new FormGroup({
@@ -103,6 +104,41 @@ export class AdminUsersPage implements OnInit, OnDestroy {
 
   get displayedUsers(): AdminUser[] | UserSearchResult[] {
     return this.isSearchMode() ? this.searchResults() : this.allUsers();
+  }
+
+  // ── Role filter ──────────────────────────────────────────
+  filterByRole(role: 'TRAVELER' | 'ADMIN'): void {
+    // Toggle: clicking the active filter clears it
+    if (this.activeRoleFilter() === role) {
+      this.activeRoleFilter.set(null);
+      this.isSearchMode.set(false);
+      this.searchResults.set([]);
+      return;
+    }
+
+    this.activeRoleFilter.set(role);
+    this.isSearchMode.set(true);
+    this.searching.set(true);
+    // Reset email search when switching to role filter
+    this.searchForm.reset({ email: '' }, { emitEvent: false });
+
+    this.userService.getUsersByRole(role).subscribe({
+      next: (results) => {
+        this.searchResults.set(results);
+        this.searching.set(false);
+      },
+      error: () => {
+        this.toast.show('Filter error', 'Failed to filter users by role.');
+        this.searching.set(false);
+      }
+    });
+  }
+
+  clearAllFilters(): void {
+    this.activeRoleFilter.set(null);
+    this.isSearchMode.set(false);
+    this.searchResults.set([]);
+    this.searchForm.reset({ email: '' }, { emitEvent: false });
   }
 
   // ── Navigation ───────────────────────────────────────────────────

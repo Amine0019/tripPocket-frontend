@@ -75,4 +75,10 @@ export class UserService {
       .set('email', criteria.email?.trim() ?? '');
     return this.http.get<UserSearchResult[]>(`${this.apiUrl}/search`, { params });
   }
+
+  // ── Filter by role (backend) ───────────────────────────────────
+  getUsersByRole(role: 'TRAVELER' | 'ADMIN'): Observable<UserSearchResult[]> {
+    const params = new HttpParams().set('role', role);
+    return this.http.get<UserSearchResult[]>(`${this.apiUrl}/filter`, { params });
+  }
 }

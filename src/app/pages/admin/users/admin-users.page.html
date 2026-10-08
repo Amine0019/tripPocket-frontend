@@ -35,6 +35,36 @@
     </div>
   </form>
 
+  <!-- Role filter bar -->
+  <div class="filter-bar">
+    <span class="filter-label">Filter by role:</span>
+    <div class="filter-chips">
+      <button type="button" class="chip"
+              [class.chip-active]="activeRoleFilter() === 'TRAVELER'"
+              (click)="filterByRole('TRAVELER')">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        Travelers
+      </button>
+      <button type="button" class="chip"
+              [class.chip-active]="activeRoleFilter() === 'ADMIN'"
+              (click)="filterByRole('ADMIN')">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/>
+        </svg>
+        Admins
+      </button>
+    </div>
+    @if (activeRoleFilter()) {
+      <button type="button" class="btn-clear-filter" (click)="clearAllFilters()">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+        Clear filter
+      </button>
+    }
+  </div>
 
   <!-- Loading (initial) -->
   @if (loading()) {
