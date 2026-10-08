@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -21,6 +21,21 @@ export interface AdminUserPayload {
   password?: string;
   role?: 'TRAVELER' | 'ADMIN';
   enabled?: boolean;
+}
+
+/** DTO returned by the backend search endpoint — no id field */
+export interface UserSearchResult {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'TRAVELER' | 'ADMIN';
+  enabled: boolean;
+}
+
+export interface UserSearchCriteria {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
 }
 
 @Injectable({
@@ -55,5 +70,13 @@ export class UserService {
   deleteUser(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-}
 
+  // ── Multi-criteria search (backend) ────────────────────────────
+  searchUsers(criteria: UserSearchCriteria): Observable<UserSearchResult[]> {
+    let params = new HttpParams()
+      .set('firstName', criteria.firstName?.trim() ?? '')
+      .set('lastName',  criteria.lastName?.trim()  ?? '')
+      .set('email',     criteria.email?.trim()     ?? '');
+    return this.http.get<UserSearchResult[]>(`${this.apiUrl}/search`, { params });
+  }
+}

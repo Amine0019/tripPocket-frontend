@@ -14,7 +14,51 @@
     </a>
   </div>
 
-  <!-- Loading -->
+  <!-- Search bar -->
+  <form class="search-bar" [formGroup]="searchForm" autocomplete="off">
+    <div class="search-fields">
+      <div class="search-field">
+        <label for="search-firstname">First name</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <input id="search-firstname" type="text" class="search-input" placeholder="Search by first name…"
+                 formControlName="firstName"/>
+        </div>
+      </div>
+      <div class="search-field">
+        <label for="search-lastname">Last name</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <input id="search-lastname" type="text" class="search-input" placeholder="Search by last name…"
+                 formControlName="lastName"/>
+        </div>
+      </div>
+      <div class="search-field">
+        <label for="search-email">Email</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 7 10-7"/>
+          </svg>
+          <input id="search-email" type="text" class="search-input" placeholder="Search by email…"
+                 formControlName="email"/>
+        </div>
+      </div>
+    </div>
+    @if (isSearchMode()) {
+      <button type="button" class="btn-reset" (click)="resetSearch()" title="Clear search">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+        Clear
+      </button>
+    }
+  </form>
+
+  <!-- Loading (initial) -->
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
@@ -30,21 +74,48 @@
     </div>
   }
 
-  <!-- Empty -->
-  @if (!loading() && !error() && users().length === 0) {
+  <!-- Search spinner -->
+  @if (!loading() && !error() && searching()) {
+    <div class="search-spinner">
+      <div class="spinner spinner-sm"></div>
+      <span>Searching…</span>
+    </div>
+  }
+
+  <!-- Search mode: result count / no results -->
+  @if (!loading() && !error() && !searching() && isSearchMode()) {
+    @if (searchResults().length === 0) {
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <p>No users match your search.</p>
+        <button class="btn btn-outline" type="button" (click)="resetSearch()">Clear search</button>
+      </div>
+    } @else {
+      <p class="search-label">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        {{ searchResults().length }} result{{ searchResults().length === 1 ? '' : 's' }} found
+      </p>
+    }
+  }
+
+  <!-- Full list: empty -->
+  @if (!loading() && !error() && !isSearchMode() && allUsers().length === 0) {
     <div class="empty-state">
       <p>No users found.</p>
       <a class="btn btn-primary" routerLink="/admin/users/new">Create first user</a>
     </div>
   }
 
-  <!-- Table -->
-  @if (!loading() && !error() && users().length > 0) {
+  <!-- Table — full list mode -->
+  @if (!loading() && !error() && !isSearchMode() && allUsers().length > 0) {
     <div class="table-wrap">
       <table class="users-table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>First name</th>
             <th>Last name</th>
             <th>Email</th>
@@ -54,9 +125,8 @@
           </tr>
         </thead>
         <tbody>
-          @for (user of users(); track user.id) {
+          @for (user of allUsers(); track user.id) {
             <tr>
-              <td class="td-id">{{ user.id }}</td>
               <td>{{ user.firstName }}</td>
               <td>{{ user.lastName }}</td>
               <td class="td-email">{{ user.email }}</td>
@@ -92,6 +162,42 @@
         </tbody>
       </table>
     </div>
-    <p class="table-count">{{ users().length }} user{{ users().length === 1 ? '' : 's' }}</p>
+    <p class="table-count">{{ allUsers().length }} user{{ allUsers().length === 1 ? '' : 's' }}</p>
+  }
+
+  <!-- Table — search results mode (no id, no actions) -->
+  @if (!loading() && !error() && isSearchMode() && !searching() && searchResults().length > 0) {
+    <div class="table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Enabled</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of searchResults(); track user.email) {
+            <tr>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
+              <td class="td-email">{{ user.email }}</td>
+              <td>
+                <span class="badge" [class.badge-admin]="user.role === 'ADMIN'" [class.badge-traveler]="user.role === 'TRAVELER'">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>
+                <span class="status-dot" [class.dot-on]="user.enabled" [class.dot-off]="!user.enabled">
+                  {{ user.enabled ? 'Active' : 'Disabled' }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </section>
