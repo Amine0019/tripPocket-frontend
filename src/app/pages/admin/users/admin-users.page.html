@@ -179,7 +179,7 @@
         </span>
         <div class="page-size-wrap">
           <label for="page-size-select">Per page:</label>
-          <select id="page-size-select" class="page-size-select" [value]="pageSize()" (change)="changePageSize($event)">
+          <select id="page-size-select" class="page-size-select" [formControl]="pageSizeControl">
             @for (size of pageSizeOptions; track size) {
               <option [value]="size">{{ size }}</option>
             }

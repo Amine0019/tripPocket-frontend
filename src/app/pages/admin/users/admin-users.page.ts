@@ -31,12 +31,14 @@ export class AdminUsersPage implements OnInit, OnDestroy {
 
   // ── Pagination State ─────────────────────────────────────────────
   currentPage      = signal<number>(0);
-  pageSize         = signal<number>(10);
+  pageSize         = signal<number>(5);
   totalPages       = signal<number>(0);
   totalElements    = signal<number>(0);
   isFirstPage      = signal<boolean>(true);
   isLastPage       = signal<boolean>(true);
   readonly pageSizeOptions = [5, 10, 20, 50];
+
+  pageSizeControl  = new FormControl<number>(5, { nonNullable: true });
 
   // ── Search form (email only) ─────────────────────────────────────
   searchForm = new FormGroup({
@@ -45,6 +47,7 @@ export class AdminUsersPage implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
+    this.listenToPageSize();
     this.loadUsers();
     this.listenToSearch();
   }
@@ -63,6 +66,9 @@ export class AdminUsersPage implements OnInit, OnDestroy {
         this.allUsers.set(response.content);
         this.currentPage.set(response.pageNumber);
         this.pageSize.set(response.pageSize);
+        if (this.pageSizeControl.value !== response.pageSize) {
+          this.pageSizeControl.setValue(response.pageSize, { emitEvent: false });
+        }
         this.totalPages.set(response.totalPages);
         this.totalElements.set(response.totalElements);
         this.isFirstPage.set(response.first);
@@ -74,6 +80,19 @@ export class AdminUsersPage implements OnInit, OnDestroy {
         this.loading.set(false);
       }
     });
+  }
+
+  // ── Reactive page size ──────────────────────────────────────────
+  private listenToPageSize(): void {
+    this.pageSizeControl.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((newSize) => {
+        const size = Number(newSize);
+        if (!isNaN(size) && size > 0 && size !== this.pageSize()) {
+          this.pageSize.set(size);
+          this.loadUsers(0, size);
+        }
+      });
   }
 
   // ── Reactive search ──────────────────────────────────────────────
