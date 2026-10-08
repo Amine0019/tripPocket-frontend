@@ -14,49 +14,27 @@
     </a>
   </div>
 
-  <!-- Search bar -->
+  <!-- Search bar (email) -->
   <form class="search-bar" [formGroup]="searchForm" autocomplete="off">
-    <div class="search-fields">
-      <div class="search-field">
-        <label for="search-firstname">First name</label>
-        <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
-          <input id="search-firstname" type="text" class="search-input" placeholder="Search by first name…"
-                 formControlName="firstName"/>
-        </div>
-      </div>
-      <div class="search-field">
-        <label for="search-lastname">Last name</label>
-        <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
-          <input id="search-lastname" type="text" class="search-input" placeholder="Search by last name…"
-                 formControlName="lastName"/>
-        </div>
-      </div>
-      <div class="search-field">
-        <label for="search-email">Email</label>
-        <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 7 10-7"/>
-          </svg>
-          <input id="search-email" type="text" class="search-input" placeholder="Search by email…"
-                 formControlName="email"/>
-        </div>
+    <div class="search-field search-field--full">
+      <label for="search-email">Search by email</label>
+      <div class="input-wrap">
+        <svg class="input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 7 10-7"/>
+        </svg>
+        <input id="search-email" type="text" class="search-input" placeholder="Search users by email address…"
+               formControlName="email"/>
+        @if (isSearchMode()) {
+          <button type="button" class="btn-clear" (click)="resetSearch()" title="Clear search">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        }
       </div>
     </div>
-    @if (isSearchMode()) {
-      <button type="button" class="btn-reset" (click)="resetSearch()" title="Clear search">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M18 6 6 18M6 6l12 12"/>
-        </svg>
-        Clear
-      </button>
-    }
   </form>
+
 
   <!-- Loading (initial) -->
   @if (loading()) {

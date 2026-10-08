@@ -28,12 +28,11 @@ export class AdminUsersPage implements OnInit, OnDestroy {
   isSearchMode  = signal(false);
   error         = signal('');
 
-  // ── Search form ──────────────────────────────────────────────────
+  // ── Search form (email only) ─────────────────────────────────────
   searchForm = new FormGroup({
-    firstName: new FormControl(''),
-    lastName:  new FormControl(''),
-    email:     new FormControl(''),
+    email: new FormControl(''),
   });
+
 
   ngOnInit(): void {
     this.loadUsers();
@@ -67,22 +66,18 @@ export class AdminUsersPage implements OnInit, OnDestroy {
       debounceTime(350),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
       switchMap((values) => {
-        const firstName = values.firstName?.trim() ?? '';
-        const lastName  = values.lastName?.trim()  ?? '';
-        const email     = values.email?.trim()     ?? '';
-        const hasQuery  = firstName !== '' || lastName !== '' || email !== '';
+        const email = values.email?.trim() ?? '';
 
-        if (!hasQuery) {
+        if (email === '') {
           this.isSearchMode.set(false);
           this.searching.set(false);
           this.searchResults.set([]);
-          // return a completed observable so switchMap is satisfied
           return [];
         }
 
         this.isSearchMode.set(true);
         this.searching.set(true);
-        return this.userService.searchUsers({ firstName, lastName, email });
+        return this.userService.searchUsers({ email });
       }),
       takeUntil(this.destroy$)
     ).subscribe({
@@ -101,7 +96,7 @@ export class AdminUsersPage implements OnInit, OnDestroy {
 
   // ── Reset search ─────────────────────────────────────────────────
   resetSearch(): void {
-    this.searchForm.reset({ firstName: '', lastName: '', email: '' });
+    this.searchForm.reset({ email: '' });
     this.isSearchMode.set(false);
     this.searchResults.set([]);
   }

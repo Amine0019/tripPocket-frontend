@@ -33,8 +33,6 @@ export interface UserSearchResult {
 }
 
 export interface UserSearchCriteria {
-  firstName?: string;
-  lastName?: string;
   email?: string;
 }
 
@@ -71,12 +69,10 @@ export class UserService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  // ── Multi-criteria search (backend) ────────────────────────────
+  // ── Email search (backend) ─────────────────────────────────────
   searchUsers(criteria: UserSearchCriteria): Observable<UserSearchResult[]> {
-    let params = new HttpParams()
-      .set('firstName', criteria.firstName?.trim() ?? '')
-      .set('lastName',  criteria.lastName?.trim()  ?? '')
-      .set('email',     criteria.email?.trim()     ?? '');
+    const params = new HttpParams()
+      .set('email', criteria.email?.trim() ?? '');
     return this.http.get<UserSearchResult[]>(`${this.apiUrl}/search`, { params });
   }
 }
