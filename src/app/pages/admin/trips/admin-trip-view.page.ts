@@ -7,6 +7,8 @@ import { TripCoverImageComponent } from '../../../shared/components/trip-cover-i
 import { TripStatus } from '../../../shared/models/enums/trip-status.enum';
 import { Trip } from '../../../shared/models/trip.model';
 
+import { TravelStore } from '../../../core/services/travel.store';
+
 declare const Swal: any;
 
 @Component({
@@ -18,6 +20,7 @@ declare const Swal: any;
 })
 export class AdminTripViewPage implements OnInit {
   private readonly tripService = inject(TripService);
+  private readonly store       = inject(TravelStore);
   private readonly toast       = inject(ToastService);
   private readonly router      = inject(Router);
   private readonly route       = inject(ActivatedRoute);
@@ -79,6 +82,7 @@ export class AdminTripViewPage implements OnInit {
     this.tripService.deleteTrip(currentTrip.id).subscribe({
       next: () => {
         this.toast.show('Trip deleted', `"${title}" has been deleted.`);
+        this.store.removeTrip(currentTrip.id);
         void this.router.navigate(['/admin/trips']);
       },
       error: () => {

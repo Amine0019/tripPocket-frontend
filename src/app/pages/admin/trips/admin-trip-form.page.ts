@@ -7,6 +7,8 @@ import { ToastService } from '../../../core/services/toast.service';
 import { TripService } from '../../../core/services/trip.service';
 import { TripCoverImageComponent } from '../../../shared/components/trip-cover-image/trip-cover-image.component';
 import { TripStatus } from '../../../shared/models/enums/trip-status.enum';
+import { TravelStore } from '../../../core/services/travel.store';
+import { AiService } from '../../../core/services/ai.service';
 import { ItineraryDay, Trip, TripFormData } from '../../../shared/models/trip.model';
 
 @Component({
@@ -18,6 +20,8 @@ import { ItineraryDay, Trip, TripFormData } from '../../../shared/models/trip.mo
 })
 export class AdminTripFormPage implements OnInit {
   private readonly tripService = inject(TripService);
+  private readonly aiService   = inject(AiService);
+  private readonly store       = inject(TravelStore);
   private readonly toast       = inject(ToastService);
   private readonly router      = inject(Router);
   private readonly route       = inject(ActivatedRoute);
@@ -27,6 +31,12 @@ export class AdminTripFormPage implements OnInit {
   saving     = signal<boolean>(false);
   errorList  = signal<string[]>([]);
   tripId: number | null = null;
+
+  // AI Assistant state
+  aiKeywords = '';
+  aiTaglineLoading = signal<boolean>(false);
+  aiItineraryLoading = signal<boolean>(false);
+  aiError = signal<string>('');
 
   // Cover image management
   selectedFile: File | null = null;
@@ -140,6 +150,70 @@ export class AdminTripFormPage implements OnInit {
     }
   }
 
+  // ── AI Generation Methods ─────────────────────────────────────────
+  generateTagline(): void {
+    const keywords = this.aiKeywords.trim();
+    if (!keywords) {
+      this.aiError.set('Type 2-3 keywords first, for example: Egypt, Giza');
+      return;
+    }
+    this.aiError.set('');
+    this.aiTaglineLoading.set(true);
+
+    this.aiService.generateTagline(keywords).subscribe({
+      next: (res) => {
+        if (res.headline) {
+          this.draft.title = res.headline;
+        }
+        if (res.description) {
+          this.draft.description = res.description;
+        }
+        this.aiTaglineLoading.set(false);
+        this.toast.show('✨ Tagline generated', 'Title and description updated from AI.');
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'AI generation failed, please try again.';
+        this.aiError.set(msg);
+        this.aiTaglineLoading.set(false);
+      }
+    });
+  }
+
+  generateItinerary(): void {
+    const destination = (this.draft.destination || '').trim();
+    if (!destination) {
+      this.aiError.set('Enter a destination first (e.g. Egypt)');
+      return;
+    }
+    if (this.draft.itinerary?.length && !confirm('Replace the current itinerary with an AI suggestion?')) {
+      return;
+    }
+
+    let days = Number(this.draft.durationDays) || 0;
+    if (!days && this.draft.startDate && this.draft.endDate) {
+      const ms = new Date(this.draft.endDate).getTime() - new Date(this.draft.startDate).getTime();
+      days = Math.round(ms / 86400000) + 1;
+    }
+    days = days > 0 ? days : 7;
+
+    this.aiError.set('');
+    this.aiItineraryLoading.set(true);
+
+    this.aiService.generateItinerary(destination, days, this.aiKeywords.trim()).subscribe({
+      next: (plan) => {
+        this.draft.itinerary = plan;
+        this.draft.durationDays = days;
+        this.aiItineraryLoading.set(false);
+        this.toast.show('✨ Itinerary generated', `Suggested ${days}-day itinerary for ${destination}.`);
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'AI generation failed, please try again.';
+        this.aiError.set(msg);
+        this.aiItineraryLoading.set(false);
+      }
+    });
+  }
+
   // ── Cover Image File Handling ────────────────────────────────────
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -214,6 +288,7 @@ export class AdminTripFormPage implements OnInit {
     request$.subscribe({
       next: (savedTrip) => {
         this.saving.set(false);
+        this.store.loadTripsFromBackend();
         this.toast.show(
           this.isEdit() ? 'Trip updated' : 'Trip created',
           `"${savedTrip.title || savedTrip.destination}" was successfully ${this.isEdit() ? 'updated' : 'created'}.`

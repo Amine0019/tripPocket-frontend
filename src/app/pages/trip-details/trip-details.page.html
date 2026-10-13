@@ -1,6 +1,6 @@
 @if (trip(); as trip) {
   <section class="hero">
-    <img [src]="trip.image" [alt]="trip.title" />
+    <img [src]="trip.image" [alt]="trip.title" (error)="onImgError($event)" />
     <div class="veil"></div>
     <div class="container copy">
       <p class="eyebrow">{{ trip.country }}</p>

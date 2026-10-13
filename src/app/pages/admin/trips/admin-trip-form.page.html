@@ -106,6 +106,30 @@
             />
           </label>
         </div>
+
+        <!-- ✨ AI assistant -->
+        <div class="ai-box">
+          <div class="ai-box-head">
+            <strong>✨ AI assistant</strong>
+            <span class="field-hint">Type 2-3 keywords (e.g. "Egypt, Giza") to generate a title and a short description.</span>
+          </div>
+          <div class="add-highlight-row">
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="aiKeywords"
+              name="aiKeywords"
+              placeholder="e.g. Egypt, Giza, pyramids"
+              (keyup.enter)="generateTagline()"
+            />
+            <button type="button" class="btn btn-primary" (click)="generateTagline()" [disabled]="aiTaglineLoading()">
+              @if (aiTaglineLoading()) { Generating… } @else { ✨ Generate }
+            </button>
+          </div>
+          @if (aiError()) {
+            <p class="ai-error">{{ aiError() }}</p>
+          }
+        </div>
       </div>
 
       <!-- ── SECTION 2: DATES & SCHEDULE ── -->
@@ -372,9 +396,14 @@
           <h3 class="card-section-title">
             <span class="step-num">7</span> Day-by-Day Itinerary
           </h3>
-          <button type="button" class="btn btn-sm btn-outline" (click)="addItineraryDay()">
-            + Add Day
-          </button>
+          <div class="header-actions">
+            <button type="button" class="btn btn-sm btn-primary" (click)="generateItinerary()" [disabled]="aiItineraryLoading()">
+              @if (aiItineraryLoading()) { Planning… } @else { ✨ Suggest with AI }
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" (click)="addItineraryDay()">
+              + Add Day
+            </button>
+          </div>
         </div>
 
         <div class="itinerary-builder">

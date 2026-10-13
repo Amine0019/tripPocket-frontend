@@ -455,3 +455,48 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+// ── AI Assistant ──────────────────────────────────────────────────
+.ai-box {
+  margin-top: 1.25rem;
+  padding: 1.1rem 1.25rem;
+  background: linear-gradient(135deg, #f7fdfa 0%, #f4fbf9 100%);
+  border: 1px dashed var(--teal, #1b7c6e);
+  border-radius: 14px;
+}
+
+.ai-box-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.85rem;
+
+  strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--teal, #1b7c6e);
+  }
+
+  .field-hint {
+    font-size: 12.5px;
+    color: var(--muted, #6d7c83);
+  }
+}
+
+.ai-error {
+  color: #c0392b;
+  background: #fdf2f2;
+  border-left: 3px solid #c0392b;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin: 0.65rem 0 0;
+  font-size: 0.875rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+

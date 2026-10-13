@@ -27,4 +27,11 @@ export class TripCardComponent {
     this.store.toggleFavorite(this.trip.id);
     this.favorite.emit(this.trip.id);
   }
+
+  onImgError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80';
+    }
+  }
 }

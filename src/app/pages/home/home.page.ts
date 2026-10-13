@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { AfterViewInit, Component, DestroyRef, ElementRef, PLATFORM_ID, computed, inject } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, computed, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IMG } from '../../core/data/images';
 import { SearchQuery, TripCategory } from '../../core/models/models';
@@ -16,7 +16,7 @@ import { TripCardComponent } from '../../shared/components/trip-card/trip-card.c
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss'
 })
-export class HomePage implements AfterViewInit {
+export class HomePage implements OnInit, AfterViewInit {
   private readonly store = inject(TravelStore);
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
@@ -29,6 +29,10 @@ export class HomePage implements AfterViewInit {
   readonly destinations = this.store.destinations;
   readonly activities = computed(() => this.store.activities().slice(0, 3));
   readonly categories: TripCategory[] = ['Adventure', 'Culture', 'Food & wine', 'Nature', 'Relaxation'];
+
+  ngOnInit(): void {
+    this.store.loadTripsFromBackend();
+  }
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
