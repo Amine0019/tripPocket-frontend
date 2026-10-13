@@ -10,6 +10,7 @@ import { TripStatus } from '../../../shared/models/enums/trip-status.enum';
 import { TravelStore } from '../../../core/services/travel.store';
 import { AiService } from '../../../core/services/ai.service';
 import { ItineraryDay, Trip, TripFormData } from '../../../shared/models/trip.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-admin-trip-form-page',
@@ -179,14 +180,32 @@ export class AdminTripFormPage implements OnInit {
     });
   }
 
-  generateItinerary(): void {
+  async generateItinerary(): Promise<void> {
     const destination = (this.draft.destination || '').trim();
     if (!destination) {
       this.aiError.set('Enter a destination first (e.g. Egypt)');
       return;
     }
-    if (this.draft.itinerary?.length && !confirm('Replace the current itinerary with an AI suggestion?')) {
-      return;
+
+    if (this.draft.itinerary && this.draft.itinerary.length > 0) {
+      const confirmResult = await Swal.fire({
+        title: 'Replace itinerary?',
+        text: 'Generating a new AI itinerary will replace the days currently listed.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, replace',
+        cancelButtonText: 'Keep current',
+        confirmButtonColor: '#1b7c6e',
+        cancelButtonColor: '#94a3b8',
+        reverseButtons: true,
+        customClass: {
+          popup: 'tp-swal-popup',
+          title: 'tp-swal-title'
+        }
+      });
+      if (!confirmResult.isConfirmed) {
+        return;
+      }
     }
 
     let days = Number(this.draft.durationDays) || 0;
