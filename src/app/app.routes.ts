@@ -21,6 +21,9 @@ import { AdminDashboardPage } from './pages/admin/dashboard/admin-dashboard.page
 import { AdminUsersPage } from './pages/admin/users/admin-users.page';
 import { AdminUserFormPage } from './pages/admin/users/admin-user-form.page';
 import { AdminUserViewPage } from './pages/admin/users/admin-user-view.page';
+import { AdminTripsPage } from './pages/admin/trips/admin-trips.page';
+import { AdminTripFormPage } from './pages/admin/trips/admin-trip-form.page';
+import { AdminTripViewPage } from './pages/admin/trips/admin-trip-view.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'trips', pathMatch: 'full' },
@@ -46,7 +49,11 @@ export const routes: Routes = [
       { path: 'users', component: AdminUsersPage },
       { path: 'users/new', component: AdminUserFormPage },
       { path: 'users/:id', component: AdminUserViewPage },
-      { path: 'users/:id/edit', component: AdminUserFormPage }
+      { path: 'users/:id/edit', component: AdminUserFormPage },
+      { path: 'trips', component: AdminTripsPage },
+      { path: 'trips/new', component: AdminTripFormPage },
+      { path: 'trips/:id', component: AdminTripViewPage },
+      { path: 'trips/:id/edit', component: AdminTripFormPage }
     ]
   },
   { path: 'login', component: LoginPage },

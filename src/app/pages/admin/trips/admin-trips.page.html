@@ -1,0 +1,414 @@
+<section class="trips-section">
+  <!-- Header -->
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h2>Trips</h2>
+      <p class="muted">Manage and curate travel packages, itineraries, highlights, and pricing.</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/admin/trips/new">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      New Trip
+    </a>
+  </div>
+
+  <!-- Summary KPI cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card" (click)="setStatusFilter(null)" [class.kpi-active]="activeStatusFilter() === null">
+      <div class="kpi-info">
+        <span class="kpi-label">Total trips</span>
+        <strong class="kpi-value">{{ totalCount() }}</strong>
+      </div>
+      <div class="kpi-icon kpi-icon-teal">✈</div>
+    </div>
+
+    <div class="kpi-card" (click)="setStatusFilter('PLANNED')" [class.kpi-active]="activeStatusFilter() === 'PLANNED'">
+      <div class="kpi-info">
+        <span class="kpi-label">Planned</span>
+        <strong class="kpi-value">{{ plannedCount() }}</strong>
+      </div>
+      <div class="kpi-icon kpi-icon-blue">🗓</div>
+    </div>
+
+    <div class="kpi-card" (click)="setStatusFilter('ONGOING')" [class.kpi-active]="activeStatusFilter() === 'ONGOING'">
+      <div class="kpi-info">
+        <span class="kpi-label">Ongoing</span>
+        <strong class="kpi-value">{{ ongoingCount() }}</strong>
+      </div>
+      <div class="kpi-icon kpi-icon-amber">⚡</div>
+    </div>
+
+    <div class="kpi-card" (click)="setStatusFilter('COMPLETED')" [class.kpi-active]="activeStatusFilter() === 'COMPLETED'">
+      <div class="kpi-info">
+        <span class="kpi-label">Completed</span>
+        <strong class="kpi-value">{{ completedCount() }}</strong>
+      </div>
+      <div class="kpi-icon kpi-icon-green">✔</div>
+    </div>
+  </div>
+
+  <!-- Controls bar: Search & Filters -->
+  <div class="toolbar-card">
+    <div class="search-row">
+      <!-- Search input -->
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by destination, title, subtitle or badge…"
+          [formControl]="searchControl"
+        />
+        @if (searchQuery()) {
+          <button type="button" class="btn-clear" (click)="searchControl.setValue('')" title="Clear search">
+            ✕
+          </button>
+        }
+      </div>
+
+      <!-- User ID filter test box -->
+      <div class="user-filter-wrap">
+        <input
+          type="number"
+          class="user-input"
+          placeholder="Filter by User ID"
+          [formControl]="userIdControl"
+          (keyup.enter)="filterByUser()"
+        />
+        <button type="button" class="btn btn-sm btn-outline" (click)="filterByUser()">
+          Filter
+        </button>
+        @if (userFilterId()) {
+          <button type="button" class="btn btn-sm btn-clear-filter" (click)="clearUserFilter()">
+            Reset
+          </button>
+        }
+      </div>
+
+      <!-- View mode toggle -->
+      <div class="view-toggle">
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.toggle-active]="viewMode() === 'grid'"
+          (click)="toggleViewMode('grid')"
+          title="Grid view"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.toggle-active]="viewMode() === 'table'"
+          (click)="toggleViewMode('table')"
+          title="Table view"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Status filter chips -->
+    <div class="chips-row">
+      <span class="chips-label">Status:</span>
+      <div class="chip-group">
+        <button
+          type="button"
+          class="chip"
+          [class.chip-active]="activeStatusFilter() === null"
+          (click)="setStatusFilter(null)"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          class="chip"
+          [class.chip-active]="activeStatusFilter() === 'PLANNED'"
+          (click)="setStatusFilter('PLANNED')"
+        >
+          Planned
+        </button>
+        <button
+          type="button"
+          class="chip"
+          [class.chip-active]="activeStatusFilter() === 'ONGOING'"
+          (click)="setStatusFilter('ONGOING')"
+        >
+          Ongoing
+        </button>
+        <button
+          type="button"
+          class="chip"
+          [class.chip-active]="activeStatusFilter() === 'COMPLETED'"
+          (click)="setStatusFilter('COMPLETED')"
+        >
+          Completed
+        </button>
+      </div>
+
+      @if (activeStatusFilter() !== null) {
+        <button type="button" class="btn-clear-filter" (click)="setStatusFilter(null)">
+          Clear status filter
+        </button>
+      }
+
+      @if (userFilterId()) {
+        <span class="active-user-badge">
+          Filtered by User #{{ userFilterId() }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading trips from backend…</p>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (!loading() && error()) {
+    <div class="alert-error">
+      <span>⚠ {{ error() }}</span>
+      <button class="btn btn-outline" type="button" (click)="loadAllTrips()">Retry</button>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading() && !error() && filteredTrips().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">✈</div>
+      <h3>No trips found</h3>
+      <p class="muted">
+        @if (searchQuery() || activeStatusFilter() || userFilterId()) {
+          No trips matched your search criteria.
+        } @else {
+          There are currently no trips in the database. Create the first one!
+        }
+      </p>
+      @if (searchQuery() || activeStatusFilter() || userFilterId()) {
+        <button class="btn btn-outline" type="button" (click)="searchControl.setValue(''); setStatusFilter(null); clearUserFilter()">
+          Clear filters
+        </button>
+      } @else {
+        <a class="btn btn-primary" routerLink="/admin/trips/new">
+          + Create First Trip
+        </a>
+      }
+    </div>
+  }
+
+  <!-- Results: Grid View -->
+  @if (!loading() && !error() && filteredTrips().length > 0 && viewMode() === 'grid') {
+    <div class="trips-grid">
+      @for (trip of filteredTrips(); track trip.id) {
+        <article class="trip-card">
+          <!-- Thumbnail & Cover -->
+          <div class="card-cover">
+            <app-trip-cover-image [tripId]="trip.id" [alt]="trip.title || trip.destination"></app-trip-cover-image>
+            
+            <div class="cover-badges">
+              <span class="status-badge" [ngClass]="getStatusClass(trip.status)">
+                {{ trip.status || 'PLANNED' }}
+              </span>
+              @if (trip.badge) {
+                <span class="highlight-badge">{{ trip.badge }}</span>
+              }
+            </div>
+            
+            <span class="destination-pill">
+              📍 {{ trip.destination }}
+            </span>
+          </div>
+
+          <!-- Content -->
+          <div class="card-body">
+            <div class="card-header">
+              <h3 class="trip-title" [title]="trip.title || trip.destination">
+                {{ trip.title || trip.destination }}
+              </h3>
+              @if (trip.subtitle) {
+                <p class="trip-subtitle">{{ trip.subtitle }}</p>
+              }
+            </div>
+
+            <!-- Dates & Duration -->
+            <div class="meta-row">
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                </svg>
+                {{ trip.startDate }} → {{ trip.endDate }}
+              </span>
+              @if (trip.durationDays) {
+                <span class="duration-tag">{{ trip.durationDays }} days</span>
+              }
+            </div>
+
+            <!-- Price & Logistics -->
+            <div class="price-row">
+              <div class="price-box">
+                @if (trip.price) {
+                  <strong class="price-val">{{ trip.currency || '$' }}{{ trip.price }}</strong>
+                  <span class="price-unit">/ person</span>
+                } @else {
+                  <span class="price-unset">Price not set</span>
+                }
+              </div>
+
+              @if (trip.rating) {
+                <div class="rating-box">
+                  <span class="star">★</span>
+                  <strong>{{ trip.rating }}</strong>
+                  @if (trip.reviewCount) {
+                    <small>({{ trip.reviewCount }})</small>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Details pills -->
+            <div class="tags-row">
+              @if (trip.groupSize) {
+                <span class="pill">👥 Max {{ trip.groupSize }}</span>
+              }
+              @if (trip.pace) {
+                <span class="pill">⚡ {{ trip.pace }}</span>
+              }
+              @if (trip.highlights && trip.highlights.length > 0) {
+                <span class="pill pill-accent">✦ {{ trip.highlights.length }} highlights</span>
+              }
+              @if (trip.itinerary && trip.itinerary.length > 0) {
+                <span class="pill pill-accent">🗓 {{ trip.itinerary.length }} days</span>
+              }
+            </div>
+
+            <!-- Card Actions -->
+            <div class="card-actions">
+              <button class="btn btn-sm btn-outline" type="button" (click)="viewTrip(trip.id)" title="View trip">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                View
+              </button>
+              <button class="btn btn-sm btn-outline" type="button" (click)="editTrip(trip.id)" title="Edit trip">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
+              </button>
+              <button class="btn btn-sm btn-danger-icon" type="button" (click)="deleteTrip(trip)" title="Delete trip">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- Results: Table View -->
+  @if (!loading() && !error() && filteredTrips().length > 0 && viewMode() === 'table') {
+    <div class="table-container">
+      <table class="trips-table">
+        <thead>
+          <tr>
+            <th>Trip</th>
+            <th>Destination</th>
+            <th>Dates</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Rating</th>
+            <th>Content</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (trip of filteredTrips(); track trip.id) {
+            <tr>
+              <td>
+                <div class="table-trip-cell">
+                  <div class="table-thumb">
+                    <app-trip-cover-image [tripId]="trip.id"></app-trip-cover-image>
+                  </div>
+                  <div>
+                    <strong class="table-title">{{ trip.title || trip.destination }}</strong>
+                    <div class="table-sub muted">{{ trip.subtitle || 'ID #' + trip.id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="dest-tag">📍 {{ trip.destination }}</span>
+              </td>
+              <td>
+                <div class="table-dates">
+                  <span>{{ trip.startDate }} → {{ trip.endDate }}</span>
+                  @if (trip.durationDays) {
+                    <small class="muted">({{ trip.durationDays }} d)</small>
+                  }
+                </div>
+              </td>
+              <td>
+                @if (trip.price) {
+                  <strong>{{ trip.currency || '$' }}{{ trip.price }}</strong>
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(trip.status)">
+                  {{ trip.status || 'PLANNED' }}
+                </span>
+              </td>
+              <td>
+                @if (trip.rating) {
+                  <span>★ {{ trip.rating }} <small class="muted">({{ trip.reviewCount || 0 }})</small></span>
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              <td>
+                <div class="content-counters">
+                  <span title="Highlights">✦ {{ trip.highlights?.length || 0 }}</span>
+                  <span title="Itinerary days">🗓 {{ trip.itinerary?.length || 0 }}</span>
+                </div>
+              </td>
+              <td class="text-right">
+                <div class="row-actions">
+                  <button class="action-btn" type="button" (click)="viewTrip(trip.id)" title="View">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                  <button class="action-btn" type="button" (click)="editTrip(trip.id)" title="Edit">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button class="action-btn btn-danger-action" type="button" (click)="deleteTrip(trip)" title="Delete">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
