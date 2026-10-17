@@ -27,10 +27,10 @@ export class ChatbotUserComponent implements AfterViewChecked {
   private shouldScrollToBottom = false;
 
   readonly quickSuggestions: string[] = [
-    'Quels types de voyages propose TripPocket ?',
-    'Comment suivre et gérer mon budget de voyage ?',
-    'Conseils pratiques pour préparer ma valise',
-    'Explique-moi les fonctionnalités de l’application'
+    'What types of trips does TripPocket offer?',
+    'How can I track and manage my travel budget?',
+    'Practical tips for packing my suitcase',
+    'Explain the features of the application'
   ];
 
   ngAfterViewChecked(): void {
@@ -118,13 +118,13 @@ export class ChatbotUserComponent implements AfterViewChecked {
         setTimeout(() => this.focusInput(), 100);
       },
       error: (err) => {
-        let msg = 'Une erreur est survenue lors de l’envoi. Veuillez réessayer.';
+        let msg = 'An error occurred while sending your message. Please try again.';
         if (err.status === 503) {
-          msg = err.error?.message || 'Le service IA n’est pas configuré ou la clé API est manquante.';
+          msg = err.error?.message || 'The AI service is not configured or the API key is missing.';
         } else if (err.status === 429) {
-          msg = 'Limite de requêtes atteinte. Merci de patienter quelques secondes.';
+          msg = 'Rate limit reached. Please wait a few seconds before trying again.';
         } else if (err.status === 504 || err.status === 0) {
-          msg = 'Impossible de joindre le serveur. Vérifiez votre connexion.';
+          msg = 'Unable to reach the server. Please check your connection.';
         } else if (err.error?.message) {
           msg = err.error.message;
         }

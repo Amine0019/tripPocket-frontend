@@ -4,8 +4,8 @@
   class="chatbot-fab"
   [class.active]="isOpen()"
   (click)="toggleChat()"
-  aria-label="Ouvrir l'assistant TripPocket AI"
-  title="Discuter avec TripPocket AI">
+  aria-label="Open TripPocket AI assistant"
+  title="Chat with TripPocket AI">
   @if (!isOpen()) {
     <div class="fab-content">
       <svg class="fab-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
@@ -23,7 +23,7 @@
 
 <!-- Chatbot Conversation Window -->
 @if (isOpen()) {
-  <section class="chatbot-window" aria-label="Fenêtre de discussion TripPocket AI">
+  <section class="chatbot-window" aria-label="TripPocket AI chat window">
     <!-- Header -->
     <header class="chatbot-header">
       <div class="header-left">
@@ -31,13 +31,13 @@
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
           </svg>
-          <span class="online-dot" title="En ligne"></span>
+          <span class="online-dot" title="Online"></span>
         </div>
         <div class="header-titles">
           <h3>TripPocket AI</h3>
           <p class="header-subtitle">
             <span class="pulse-status"></span>
-            Assistant de voyage intelligent
+            Intelligent travel assistant
           </p>
         </div>
       </div>
@@ -48,8 +48,8 @@
           class="header-btn"
           (click)="newConversation()"
           [disabled]="isGenerating() || messages().length === 0"
-          title="Nouvelle conversation"
-          aria-label="Nouvelle conversation">
+          title="New conversation"
+          aria-label="New conversation">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
             <path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
@@ -60,8 +60,8 @@
           type="button"
           class="header-btn"
           (click)="closeChat()"
-          title="Fermer la discussion"
-          aria-label="Fermer">
+          title="Close chat"
+          aria-label="Close">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M18 6 6 18M6 6l12 12"/>
           </svg>
@@ -79,13 +79,13 @@
               <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-2h2zm0-4.5h-2V7h2z"/>
             </svg>
           </div>
-          <h4>Bienvenue sur TripPocket AI !</h4>
+          <h4>Welcome to TripPocket AI!</h4>
           <p class="welcome-text">
-            Je suis votre assistant personnel propulsé par Gemini. Posez-moi vos questions sur les destinations, la préparation de vos séjours, vos itinéraires ou le fonctionnement de TripPocket.
+            I'm your personal assistant powered by Gemini. Ask me anything about destinations, trip planning, itineraries, or how TripPocket works.
           </p>
 
           <div class="suggestions-list">
-            <p class="suggestions-title">Suggestions de questions :</p>
+            <p class="suggestions-title">Suggested questions:</p>
             @for (suggestion of quickSuggestions; track suggestion) {
               <button
                 type="button"
@@ -136,7 +136,7 @@
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
-            <span class="typing-label">TripPocket AI réfléchit...</span>
+            <span class="typing-label">TripPocket AI is thinking...</span>
           </div>
         </div>
       }
@@ -151,7 +151,7 @@
             <span>{{ errorMessage() }}</span>
           </div>
           <button type="button" class="btn-retry" (click)="retryLastMessage()">
-            Réessayer
+            Retry
           </button>
         </div>
       }
@@ -164,7 +164,7 @@
           #messageInput
           rows="1"
           class="chat-textarea"
-          placeholder="Posez votre question à TripPocket AI..."
+          placeholder="Ask TripPocket AI a question..."
           [(ngModel)]="userInput"
           (keydown)="onKeyDown($event)"
           [disabled]="isGenerating()"
@@ -175,8 +175,8 @@
           class="btn-send"
           (click)="sendMessage()"
           [disabled]="!userInput.trim() || isGenerating()"
-          aria-label="Envoyer le message"
-          title="Envoyer (Entrée)">
+          aria-label="Send message"
+          title="Send (Enter)">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="22" y1="2" x2="11" y2="13"/>
             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -185,7 +185,7 @@
       </div>
 
       <div class="footer-hint">
-        <span>Appuyez sur <strong>Entrée</strong> pour envoyer, <strong>Maj + Entrée</strong> pour aller à la ligne</span>
+        <span>Press <strong>Enter</strong> to send, <strong>Shift + Enter</strong> for a new line</span>
       </div>
     </footer>
   </section>
