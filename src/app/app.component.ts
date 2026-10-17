@@ -6,11 +6,12 @@ import { filter, map, startWith } from 'rxjs';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { ChatbotUserComponent } from './shared/components/chatbot-user/chatbotUser.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastComponent, ChatbotUserComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -25,6 +26,20 @@ export class AppComponent {
     ),
     { initialValue: !this.isAuthRoute(this.router.url) }
   );
+
+  readonly showFrontofficeChatbot = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map((event) => this.isFrontofficeRoute((event as NavigationEnd).urlAfterRedirects)),
+      startWith(this.isFrontofficeRoute(this.router.url))
+    ),
+    { initialValue: this.isFrontofficeRoute(this.router.url) }
+  );
+
+  private isFrontofficeRoute(url: string): boolean {
+    const path = url.split('?')[0];
+    return !this.isAuthRoute(path) && !path.startsWith('/admin');
+  }
 
   private isAuthRoute(url: string): boolean {
     const path = url.split('?')[0];
