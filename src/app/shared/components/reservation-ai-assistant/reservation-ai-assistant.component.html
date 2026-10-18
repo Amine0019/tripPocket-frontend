@@ -1,0 +1,97 @@
+<section class="assistant card">
+  <header>
+    <div>
+      <p class="eyebrow">✦ AI booking assistant</p>
+      <h3>Is my trip ready?</h3>
+      <p class="muted">Checks your bookings for this trip and tells you what is still missing.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="analyze()" [disabled]="loading()">
+      {{ loading() ? 'Analyzing…' : result() ? 'Analyze again' : 'Analyze my trip with AI' }}
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="skeleton" aria-label="Analyzing">
+      <span class="ring"></span>
+      <div><span class="line w80"></span><span class="line w60"></span><span class="line w70"></span></div>
+    </div>
+  }
+
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+
+  @if (result(); as r) {
+    @if (!loading()) {
+      @if (!r.aiAvailable) {
+        <p class="notice info">The AI is not available right now: you see the automatic checks only.</p>
+      }
+
+      <div class="overview">
+        <div class="gauge" [class]="scoreTone()">
+          <svg viewBox="0 0 80 80" aria-hidden="true">
+            <circle cx="40" cy="40" r="34" class="track" />
+            <circle cx="40" cy="40" r="34" class="value" [attr.stroke-dasharray]="dash()" />
+          </svg>
+          <div class="score"><strong>{{ r.readinessScore }}</strong><span>/100</span></div>
+        </div>
+        <div>
+          <p class="label">Readiness</p>
+          <p class="summary">{{ r.summary }}</p>
+        </div>
+      </div>
+
+      @if (r.findings.length) {
+        <ul class="findings">
+          @for (f of r.findings; track f.code + f.message) {
+            <li [class]="f.severity.toLowerCase()">{{ f.message }}</li>
+          }
+        </ul>
+      }
+
+      @if (r.missing.length) {
+        <h4>Suggested bookings</h4>
+        <div class="missing">
+          @for (s of r.missing; track $index) {
+            <article [class]="s.priority.toLowerCase()">
+              <span class="icon" aria-hidden="true">{{ typeIcon(s.type) }}</span>
+              <div class="body">
+                <strong>{{ s.title }}</strong>
+                <p>{{ s.reason }}</p>
+                <p class="facts">
+                  {{ typeLabel(s.type) }}
+                  @if (s.dayNumber) { · Day {{ s.dayNumber }} }
+                  @if (s.suggestedDate) { · {{ formatDay(s.suggestedDate) }} }
+                  @if (s.estimatedPriceMin != null) {
+                    · {{ s.estimatedPriceMin | currency:'USD':'symbol':'1.0-0' }}–{{ (s.estimatedPriceMax ?? s.estimatedPriceMin) | currency:'USD':'symbol':'1.0-0' }}
+                    <span class="estimate">AI estimate</span>
+                  }
+                </p>
+              </div>
+              <button class="btn btn-outline" type="button" (click)="book(s)">Book</button>
+            </article>
+          }
+        </div>
+      }
+
+      @if (r.checklist.length) {
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          @for (item of r.checklist; track $index) {
+            <li>
+              <label><input type="checkbox" [checked]="done().has($index)" (change)="toggle($index)" />
+                <span [class.done]="done().has($index)">{{ item }}</span></label>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (r.warnings.length) {
+        <h4>Good to know</h4>
+        <ul class="warnings">
+          @for (w of r.warnings; track $index) { <li>{{ w }}</li> }
+        </ul>
+      }
+    }
+  }
+</section>

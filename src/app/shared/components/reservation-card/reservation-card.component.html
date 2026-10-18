@@ -1,16 +1,20 @@
 <article class="row">
-  <div class="icon">{{ reservation.type === 'ACCOMMODATION' ? '⌂' : reservation.type === 'TRANSPORT' ? '⌁' : reservation.type === 'ACTIVITY' ? '◇' : '✈' }}</div>
-  <div>
-    <strong>{{ reservation.title }}</strong>
-    <p>{{ reservation.tripTitle }}</p>
+  <div class="icon" aria-hidden="true">{{ typeIcon(reservation.type) }}</div>
+  <div class="main">
+    <strong>{{ title }}</strong>
+    <p>
+      @if (reservation.confirmationNumber) { <span class="code">{{ reservation.confirmationNumber }}</span> · }
+      {{ reservation.travelers }} {{ reservation.travelers > 1 ? 'travelers' : 'traveler' }}
+      @if (reservation.demo) { <span class="demo">Demo</span> }
+    </p>
   </div>
   <div class="cell hide-sm"><span>Type</span><b>{{ typeLabel(reservation.type) }}</b></div>
-  <div class="cell hide-sm"><span>Date</span><b>{{ reservation.dateLabel }}</b></div>
-  <div class="cell"><span>Amount</span><b>{{ reservation.amount | currency:'USD':'symbol':'1.0-0' }}</b></div>
+  <div class="cell hide-sm"><span>Date</span><b>{{ dateLabel || '—' }}</b></div>
+  <div class="cell"><span>Amount</span><b>{{ reservation.price | currency:'USD':'symbol':'1.0-0' }}</b></div>
   <app-status-badge [status]="reservation.status" [overlay]="false" />
   <div class="acts">
     <a [routerLink]="['/reservations', reservation.id]">View</a>
-    @if (reservation.status === 'PENDING' || reservation.status === 'CONFIRMED') {
+    @if (cancellable) {
       <button type="button" (click)="cancel.emit(reservation.id)">Cancel</button>
     }
   </div>

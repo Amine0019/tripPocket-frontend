@@ -1,42 +1,91 @@
+@if (loading()) {
+  <section class="page container"><app-loading /></section>
+} @else {
 @if (reservation(); as item) {
   <section class="page container split-layout">
-    <div class="card pad">
-      <p class="eyebrow">{{ item.type }}</p>
-      <h1 class="display">{{ item.title }}</h1>
-      <app-status-badge [status]="item.status" [overlay]="false" />
-      <dl>
-        <div><dt>Trip</dt><dd><a [routerLink]="['/trips', item.tripId]">{{ item.tripTitle }}</a></dd></div>
-        <div><dt>Dates</dt><dd>{{ item.dateLabel }}</dd></div>
-        <div><dt>Travelers</dt><dd>{{ item.travelers }}</dd></div>
-        <div><dt>Payment</dt><dd>{{ pay() }}</dd></div>
-        <div><dt>Amount</dt><dd>{{ item.amount | currency:'USD':'symbol':'1.0-0' }}</dd></div>
-      </dl>
-      @if (item.status === 'PENDING' || item.status === 'CONFIRMED') {
-        <button class="btn btn-outline" type="button" (click)="confirmOpen.set(true)">Cancel reservation</button>
+    <div class="stack">
+      <div class="card pad">
+        <div class="head">
+          <span class="icon" aria-hidden="true">{{ typeIcon(item.type) }}</span>
+          <div>
+            <p class="eyebrow">{{ typeLabel(item.type) }}</p>
+            <h1 class="display">{{ title() }}</h1>
+          </div>
+        </div>
+        <div class="meta">
+          <app-status-badge [status]="item.status" [overlay]="false" />
+          @if (item.confirmationNumber) {
+            <span class="code">{{ item.confirmationNumber }}</span>
+          }
+          @if (item.demo) {
+            <span class="demo">Demo — not saved on the server</span>
+          }
+        </div>
+
+        <ol class="timeline">
+          @for (step of timeline(); track step.label) {
+            <li [class]="step.state"><span></span>{{ step.label }}</li>
+          }
+        </ol>
+
+        <dl>
+          <div><dt>Trip</dt><dd><a [routerLink]="['/trips', item.tripId]">{{ item.tripTitle }}</a></dd></div>
+          <div><dt>Date</dt><dd>{{ dateLabel() || '—' }}</dd></div>
+          <div><dt>Travelers</dt><dd>{{ item.travelers }}</dd></div>
+          <div><dt>Payment</dt><dd>{{ paymentLabel(item.paymentMethod) }}</dd></div>
+          <div><dt>Amount</dt><dd>{{ item.price | currency:'USD':'symbol':'1.0-2' }}</dd></div>
+          @if (item.createdAt) {
+            <div><dt>Booked on</dt><dd>{{ item.createdAt | date:'MMM d, y, HH:mm' }}</dd></div>
+          }
+          @if (item.notes) {
+            <div class="wide"><dt>Notes</dt><dd>{{ item.notes }}</dd></div>
+          }
+        </dl>
+
+        <div class="actions">
+          @if (cancellable()) {
+            <button class="btn btn-outline" type="button" (click)="confirmOpen.set(true)">Cancel reservation</button>
+          }
+          <a class="btn btn-ghost" routerLink="/reservations">Back to list</a>
+        </div>
+      </div>
+
+      @if (!item.demo && item.tripId) {
+        <app-reservation-ai-assistant [tripId]="item.tripId" />
       }
-      <a class="btn btn-ghost" routerLink="/reservations">Back to list</a>
     </div>
-    @if (trip(); as trip) {
-      <aside class="card pad">
+
+    <aside class="card pad trip">
+      @if (trip(); as trip) {
         <img [src]="trip.image" [alt]="trip.title" />
         <h3>{{ trip.title }}</h3>
         <p class="muted">{{ trip.destination }}</p>
+        @if (item.tripStartDate && item.tripEndDate) {
+          <p class="muted small">{{ formatDay(item.tripStartDate) }} – {{ formatDay(item.tripEndDate) }}</p>
+        }
         <a class="btn btn-primary" [routerLink]="['/trips', trip.id]">View trip</a>
-      </aside>
-    }
+      } @else {
+        <h3>{{ item.tripTitle }}</h3>
+        @if (item.tripDestination) { <p class="muted">{{ item.tripDestination }}</p> }
+      }
+    </aside>
   </section>
 } @else {
   <section class="page container">
     <h1>Reservation not found</h1>
-    <a routerLink="/reservations">Back</a>
+    @if (error()) { <p class="muted">{{ error() }}</p> }
+    <a routerLink="/reservations">Back to my reservations</a>
   </section>
+}
 }
 
 <app-modal [open]="confirmOpen()" (closed)="confirmOpen.set(false)">
   <h2>Cancel reservation?</h2>
-  <p class="muted">This cannot be undone from the traveler view, but the record stays in your history.</p>
+  <p class="muted">The reservation will be marked as cancelled. It stays in your history.</p>
   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
-    <button class="btn btn-outline" type="button" (click)="confirmOpen.set(false)">Keep</button>
-    <button class="btn btn-primary" type="button" (click)="cancel()">Confirm cancel</button>
+    <button class="btn btn-outline" type="button" (click)="confirmOpen.set(false)" [disabled]="cancelling()">Keep</button>
+    <button class="btn btn-primary" type="button" (click)="cancel()" [disabled]="cancelling()">
+      {{ cancelling() ? 'Cancelling…' : 'Confirm cancel' }}
+    </button>
   </div>
 </app-modal>

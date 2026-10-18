@@ -1,2 +1,37 @@
 .list { padding: 8px 18px; }
 .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 22px 0 18px;
+}
+.filters { display: flex; gap: 10px; }
+.filters .input { min-width: 170px; }
+.count {
+  margin-left: 4px; padding: 0 7px; border-radius: 999px; background: rgba(0, 0, 0, .06);
+  font-size: 11px;
+}
+.pill.active .count { background: rgba(255, 255, 255, .25); }
+
+.ai-strip {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 16px 20px; margin-bottom: 14px;
+  background: linear-gradient(135deg, #f1f8f6, #fbf4ee);
+}
+.ai-strip .eyebrow { margin: 0; }
+.ai-strip .muted { margin: 4px 0 0; font-size: 13px; }
+
+.alert {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: #fdecea; color: #a23a2c; border-radius: 14px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px;
+}
+
+button[disabled] { opacity: .55; cursor: not-allowed; }
+
+@media (max-width: 700px) {
+  .filters { width: 100%; flex-direction: column; }
+}
