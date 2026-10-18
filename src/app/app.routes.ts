@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { HomePage } from './pages/home/home.page';
 import { ExploreTripsPage } from './pages/explore-trips/explore-trips.page';
 import { TripDetailsPage } from './pages/trip-details/trip-details.page';
 import { ActivitiesPage } from './pages/activities/activities.page';
@@ -27,6 +28,7 @@ import { AdminTripViewPage } from './pages/admin/trips/admin-trip-view.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'trips', pathMatch: 'full' },
+  { path: 'home', component: HomePage },
   { path: 'trips', component: ExploreTripsPage, canActivate: [authGuard] },
   { path: 'trips/:id', component: TripDetailsPage, canActivate: [authGuard] },
   { path: 'activities', component: ActivitiesPage, canActivate: [authGuard] },
