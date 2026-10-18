@@ -2,7 +2,10 @@
   <img [src]="trip.image" [alt]="trip.title" />
   <div>
     <strong>{{ trip.title }}</strong>
-    <p>{{ dates }} · {{ trip.durationDays }} days<br />{{ travelers }} travelers</p>
+    <p>
+      @if (label) { {{ label }} · }{{ dates || trip.durationDays + ' days' }}<br />
+      {{ travelers }} {{ travelers > 1 ? 'travelers' : 'traveler' }}
+    </p>
   </div>
   <b>{{ total() | currency:'USD':'symbol':'1.0-0' }}</b>
 </article>

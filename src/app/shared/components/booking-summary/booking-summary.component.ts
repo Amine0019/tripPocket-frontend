@@ -12,9 +12,13 @@ import { Trip } from '../../../core/models/models';
 export class BookingSummaryComponent {
   @Input({ required: true }) trip!: Trip;
   @Input() travelers = 2;
-  @Input() dates = 'May 18 – May 25';
+  @Input() dates = '';
+  /** What is being booked, e.g. "Trip package" or "Hotel". */
+  @Input() label = '';
+  /** Total to display; when null the trip price per person x travelers is used. */
+  @Input() amount: number | null = null;
 
   total(): number {
-    return this.trip.pricePerPerson * this.travelers;
+    return this.amount ?? this.trip.pricePerPerson * this.travelers;
   }
 }
