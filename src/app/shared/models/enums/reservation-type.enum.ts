@@ -3,5 +3,6 @@ export enum ReservationType {
   FLIGHT = 'FLIGHT',
   TRAIN = 'TRAIN',
   RESTAURANT = 'RESTAURANT',
-  ACTIVITY = 'ACTIVITY'
+  ACTIVITY = 'ACTIVITY',
+  TRIP = 'TRIP'
 }
