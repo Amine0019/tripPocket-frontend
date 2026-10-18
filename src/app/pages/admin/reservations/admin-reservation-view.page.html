@@ -1,0 +1,73 @@
+<section class="view">
+  <a class="back" routerLink="/admin/reservations">← All reservations</a>
+
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div><p>Loading…</p></div>
+  } @else if (error()) {
+    <div class="alert-error"><span>⚠ {{ error() }}</span></div>
+  } @else {
+    @if (reservation(); as r) {
+      <div class="grid">
+        <article class="panel">
+          <div class="head">
+            <span class="icon">{{ typeIcon(r.type) }}</span>
+            <div>
+              <p class="eyebrow">{{ typeLabel(r.type) }}</p>
+              <h2 class="code">{{ r.confirmationNumber || '#' + r.id }}</h2>
+            </div>
+            <app-status-badge [status]="r.status" [overlay]="false" />
+          </div>
+
+          <dl>
+            <div><dt>Trip</dt><dd><a [routerLink]="['/admin/trips', r.tripId]">{{ r.tripTitle }}</a></dd></div>
+            <div><dt>Destination</dt><dd>{{ r.tripDestination || '—' }}</dd></div>
+            <div><dt>Reservation date</dt><dd>{{ formatDay(r.reservationDate) || '—' }}</dd></div>
+            <div><dt>Trip dates</dt><dd>{{ formatDay(r.tripStartDate) }} – {{ formatDay(r.tripEndDate) }}</dd></div>
+            <div><dt>Travelers</dt><dd>{{ r.travelers }}</dd></div>
+            <div><dt>Amount</dt><dd>{{ r.price | currency:'USD':'symbol':'1.0-2' }}</dd></div>
+            <div><dt>Payment</dt><dd>{{ paymentLabel(r.paymentMethod) }}</dd></div>
+            <div><dt>Booked on</dt><dd>{{ r.createdAt ? (r.createdAt | date:'MMM d, y, HH:mm') : '—' }}</dd></div>
+            <div><dt>Last update</dt><dd>{{ r.updatedAt ? (r.updatedAt | date:'MMM d, y, HH:mm') : '—' }}</dd></div>
+            @if (r.notes) {
+              <div class="wide"><dt>Notes</dt><dd>{{ r.notes }}</dd></div>
+            }
+          </dl>
+
+          <div class="actions">
+            @for (s of nextStatuses(r.status); track s) {
+              <button class="btn" [class.btn-primary]="s !== 'CANCELLED'" [class.btn-outline]="s === 'CANCELLED'"
+                      type="button" (click)="setStatus(s)" [disabled]="busy()">
+                Mark as {{ statusLabel(s).toLowerCase() }}
+              </button>
+            }
+            <button class="btn btn-danger" type="button" (click)="remove()" [disabled]="busy()">Delete</button>
+          </div>
+        </article>
+
+        <aside class="side">
+          <article class="panel">
+            <h3>Traveler</h3>
+            <p class="strong">{{ r.userFullName || '—' }}</p>
+            <p class="muted">{{ r.userEmail }}</p>
+          </article>
+          <article class="panel">
+            <h3>Other bookings on this trip</h3>
+            @if (tripReservations().length) {
+              <ul class="others">
+                @for (o of tripReservations(); track o.id) {
+                  <li>
+                    <a [routerLink]="['/admin/reservations', o.id]">{{ o.confirmationNumber || '#' + o.id }}</a>
+                    <span>{{ typeLabel(o.type) }} · {{ o.travelers }} pax</span>
+                    <app-status-badge [status]="o.status" [overlay]="false" />
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="muted">No other booking.</p>
+            }
+          </article>
+        </aside>
+      </div>
+    }
+  }
+</section>

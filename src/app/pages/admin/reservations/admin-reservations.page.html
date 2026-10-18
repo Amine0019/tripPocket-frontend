@@ -1,0 +1,283 @@
+<section class="res-section">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h2>Reservations</h2>
+      <p class="muted">Follow bookings, confirm them and keep an eye on occupancy and cancellations.</p>
+    </div>
+    <button class="btn btn-outline" type="button" (click)="refresh()">↻ Refresh</button>
+  </div>
+
+  <!-- KPI tiles -->
+  @if (stats(); as s) {
+    <div class="kpi-grid">
+      <button type="button" class="kpi-card" [class.kpi-active]="statusFilter() === null" (click)="setStatus(null)">
+        <span class="kpi-label">Total</span>
+        <strong class="kpi-value">{{ s.total }}</strong>
+        <span class="kpi-sub">all reservations</span>
+      </button>
+      <button type="button" class="kpi-card" [class.kpi-active]="statusFilter() === 'PENDING'" (click)="setStatus($any('PENDING'))">
+        <span class="kpi-label">To confirm</span>
+        <strong class="kpi-value">{{ s.countByStatus['PENDING'] }}</strong>
+        <span class="kpi-sub">pending</span>
+      </button>
+      <button type="button" class="kpi-card" [class.kpi-active]="statusFilter() === 'CONFIRMED'" (click)="setStatus($any('CONFIRMED'))">
+        <span class="kpi-label">Confirmed</span>
+        <strong class="kpi-value">{{ s.countByStatus['CONFIRMED'] }}</strong>
+        <span class="kpi-sub">+ {{ s.countByStatus['COMPLETED'] }} completed</span>
+      </button>
+      <div class="kpi-card static">
+        <span class="kpi-label">Revenue</span>
+        <strong class="kpi-value">{{ s.revenue | currency:'USD':'symbol':'1.0-0' }}</strong>
+        <span class="kpi-sub">confirmed + completed</span>
+      </div>
+      <button type="button" class="kpi-card" [class.kpi-active]="statusFilter() === 'CANCELLED'" (click)="setStatus($any('CANCELLED'))">
+        <span class="kpi-label">Cancellation rate</span>
+        <strong class="kpi-value">{{ s.cancellationRate }}%</strong>
+        <span class="kpi-sub">{{ s.countByStatus['CANCELLED'] }} cancelled</span>
+      </button>
+    </div>
+
+    <div class="charts">
+      <!-- Status: one 100% bar, every segment also listed with its number -->
+      <article class="panel">
+        <h3>By status</h3>
+        @if (s.total) {
+          <div class="stack-bar" role="img" [attr.aria-label]="'Reservations by status, ' + s.total + ' in total'">
+            @for (bar of statusBars(); track bar.key) {
+              @if (bar.value) {
+                <span [class]="'seg ' + bar.key.toLowerCase()" [style.width.%]="bar.percent"
+                      [title]="bar.label + ': ' + bar.value"></span>
+              }
+            }
+          </div>
+          <ul class="legend">
+            @for (bar of statusBars(); track bar.key) {
+              <li>
+                <span [class]="'dot ' + bar.key.toLowerCase()"></span>
+                <span class="name">{{ bar.label }}</span>
+                <b>{{ bar.value }}</b>
+                <span class="pct">{{ bar.percent.toFixed(0) }}%</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No reservation yet.</p>
+        }
+      </article>
+
+      <!-- Type: horizontal bars, one hue, sorted -->
+      <article class="panel">
+        <h3>By type</h3>
+        <ul class="hbars">
+          @for (bar of typeBars(); track bar.key) {
+            <li [title]="bar.label + ': ' + bar.value">
+              <span class="name">{{ typeIcon(bar.key) }} {{ bar.label }}</span>
+              <span class="track"><span class="fill" [style.width.%]="bar.percent"></span></span>
+              <b>{{ bar.value }}</b>
+            </li>
+          }
+        </ul>
+      </article>
+
+      <!-- Top trips -->
+      <article class="panel">
+        <h3>Top trips</h3>
+        @if (s.topTrips.length) {
+          <ol class="top">
+            @for (t of s.topTrips; track t.tripId; let i = $index) {
+              <li>
+                <span class="rank">{{ i + 1 }}</span>
+                <div>
+                  <a [routerLink]="['/admin/trips', t.tripId]">{{ t.tripTitle }}</a>
+                  <small>{{ t.reservations }} booking{{ t.reservations === 1 ? '' : 's' }} · {{ t.travelers }} traveler{{ t.travelers === 1 ? '' : 's' }}</small>
+                </div>
+                <b>{{ t.revenue | currency:'USD':'symbol':'1.0-0' }}</b>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="muted">No booked trip yet.</p>
+        }
+      </article>
+    </div>
+  } @else if (statsError()) {
+    <div class="alert-error"><span>⚠ {{ statsError() }}</span></div>
+  }
+
+  <!-- AI insights -->
+  <article class="panel ai-panel">
+    <div class="ai-head">
+      <div>
+        <p class="eyebrow">✦ AI insights</p>
+        <h3>What should I look at today?</h3>
+        <p class="muted">The AI reads the reservation numbers and points out risks and actions.</p>
+      </div>
+      <button class="btn btn-primary" type="button" (click)="generateInsights()" [disabled]="insightsLoading()">
+        {{ insightsLoading() ? 'Analyzing…' : insights() ? 'Refresh insights' : 'Generate insights' }}
+      </button>
+    </div>
+    @if (insightsLoading()) {
+      <div class="skeleton"><span></span><span></span><span></span></div>
+    }
+    @if (insightsError()) {
+      <p class="alert-error">⚠ {{ insightsError() }}</p>
+    }
+    @if (insights(); as ai) {
+      @if (!insightsLoading()) {
+        @if (!ai.aiAvailable) {
+          <p class="ai-off">The AI is not available right now: these are the automatic checks only.</p>
+        }
+        <p class="ai-summary">{{ ai.summary }}</p>
+        <div class="ai-grid">
+          @if (ai.alerts.length) {
+            <div>
+              <h4>Alerts</h4>
+              <ul class="alerts">
+                @for (a of ai.alerts; track $index) {
+                  <li [class]="a.severity.toLowerCase()">
+                    <span class="sev">{{ a.severity === 'HIGH' ? '▲ High' : a.severity === 'MEDIUM' ? '● Medium' : '○ Low' }}</span>
+                    <strong>{{ a.title }}</strong>
+                    <p>{{ a.detail }}</p>
+                    @if (a.tripId) { <a [routerLink]="['/admin/trips', a.tripId]">Open trip</a> }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+          <div>
+            @if (ai.highlights.length) {
+              <h4>Highlights</h4>
+              <ul class="plain">
+                @for (h of ai.highlights; track $index) { <li>{{ h }}</li> }
+              </ul>
+            }
+            @if (ai.recommendations.length) {
+              <h4>Recommended actions</h4>
+              <ul class="plain actions">
+                @for (r of ai.recommendations; track $index) { <li>{{ r }}</li> }
+              </ul>
+            }
+          </div>
+        </div>
+        <p class="ai-time">Generated {{ ai.generatedAt | date:'MMM d, HH:mm' }}</p>
+      }
+    }
+  </article>
+
+  <!-- Filters -->
+  <div class="toolbar-card">
+    <div class="search-wrap">
+      <input type="search" class="search-input" placeholder="Search code, trip, destination, traveler name or email…"
+             [ngModel]="search()" (ngModelChange)="onSearch($event)" aria-label="Search reservations" />
+    </div>
+    <select class="input select" [ngModel]="typeFilter() ?? ''" (ngModelChange)="setType($event)" aria-label="Type">
+      <option value="">All types</option>
+      @for (t of types; track t) { <option [value]="t">{{ typeLabel(t) }}</option> }
+    </select>
+    <div class="chip-group">
+      <button type="button" class="chip" [class.chip-active]="statusFilter() === null" (click)="setStatus(null)">All</button>
+      @for (st of statuses; track st) {
+        <button type="button" class="chip" [class.chip-active]="statusFilter() === st" (click)="setStatus(st)">{{ statusLabel(st) }}</button>
+      }
+    </div>
+  </div>
+
+  <!-- Table -->
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div><p>Loading reservations…</p></div>
+  } @else if (error()) {
+    <div class="alert-error">
+      <span>⚠ {{ error() }}</span>
+      <button class="btn btn-outline" type="button" (click)="loadPage()">Retry</button>
+    </div>
+  } @else {
+    @if (page(); as p) {
+      @if (p.content.length) {
+        <div class="table-container">
+          <table class="res-table">
+            <thead>
+              <tr>
+                <th>Reservation</th>
+                <th>Traveler</th>
+                <th>Trip</th>
+                <th>Date</th>
+                <th class="num">Pax</th>
+                <th class="num">Amount</th>
+                <th>Status</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of p.content; track r.id) {
+                <tr [class.busy]="busyId() === r.id">
+                  <td>
+                    <div class="cell-main">
+                      <span class="type-icon" [title]="typeLabel(r.type)">{{ typeIcon(r.type) }}</span>
+                      <div>
+                        <strong class="code">{{ r.confirmationNumber || '#' + r.id }}</strong>
+                        <small>{{ typeLabel(r.type) }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <strong>{{ r.userFullName || '—' }}</strong>
+                    <small>{{ r.userEmail }}</small>
+                  </td>
+                  <td class="trip-cell">
+                    <a [routerLink]="['/admin/trips', r.tripId]">{{ r.tripTitle }}</a>
+                    <small>{{ r.tripDestination }}</small>
+                  </td>
+                  <td class="nowrap">{{ dateOf(r) || '—' }}</td>
+                  <td class="num">{{ r.travelers }}</td>
+                  <td class="num">{{ r.price | currency:'USD':'symbol':'1.0-0' }}</td>
+                  <td><app-status-badge [status]="r.status" [overlay]="false" /></td>
+                  <td class="text-right">
+                    <div class="row-actions">
+                      @if (nextStatuses(r.status).length) {
+                        <select class="status-select" [ngModel]="''" (ngModelChange)="changeStatus(r, $event)"
+                                [disabled]="busyId() === r.id" aria-label="Change status">
+                          <option value="">Set status…</option>
+                          @for (n of nextStatuses(r.status); track n) {
+                            <option [value]="n">{{ statusLabel(n) }}</option>
+                          }
+                        </select>
+                      }
+                      <button class="action-btn" type="button" (click)="view(r)" title="View">👁</button>
+                      <button class="action-btn danger" type="button" (click)="remove(r)" title="Delete"
+                              [disabled]="busyId() === r.id">🗑</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <span class="muted">
+            {{ p.pageNumber * p.pageSize + 1 }}–{{ p.pageNumber * p.pageSize + p.content.length }} of {{ p.totalElements }}
+          </span>
+          <div class="pager-controls">
+            <select class="input select small" [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)" aria-label="Rows per page">
+              <option [ngValue]="10">10 / page</option>
+              <option [ngValue]="20">20 / page</option>
+              <option [ngValue]="50">50 / page</option>
+            </select>
+            <button class="btn btn-outline small" type="button" (click)="goToPage(p.pageNumber - 1)" [disabled]="p.first">‹ Prev</button>
+            <span class="page-no">Page {{ p.pageNumber + 1 }} / {{ p.totalPages || 1 }}</span>
+            <button class="btn btn-outline small" type="button" (click)="goToPage(p.pageNumber + 1)" [disabled]="p.last">Next ›</button>
+          </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <h3>No reservations found</h3>
+          <p class="muted">{{ hasFilters() ? 'No reservation matches these filters.' : 'Travelers have not booked anything yet.' }}</p>
+          @if (hasFilters()) {
+            <button class="btn btn-outline" type="button" (click)="clearFilters()">Clear filters</button>
+          }
+        </div>
+      }
+    }
+  }
+</section>
