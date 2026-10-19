@@ -9,6 +9,9 @@
     @if (reservation(); as r) {
       <div class="grid">
         <article class="panel">
+          <div class="banner">
+            <img [src]="photo(r)" [appImgFallback]="fallbackPhoto(r)" [alt]="r.tripTitle" />
+          </div>
           <div class="head">
             <span class="icon">{{ typeIcon(r.type) }}</span>
             <div>

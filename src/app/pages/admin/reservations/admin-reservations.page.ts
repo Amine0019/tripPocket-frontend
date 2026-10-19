@@ -12,12 +12,15 @@ import {
   errorMessage,
   formatDay,
   statusLabel,
+  tripCoverUrl,
   typeIcon,
+  typeImage,
   typeLabel
 } from '../../../core/services/reservation.mapper';
 import { ReservationService } from '../../../core/services/reservation.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { ImgFallbackDirective } from '../../../shared/directives/img-fallback.directive';
 import { ReservationStatus } from '../../../shared/models/enums/reservation-status.enum';
 import { ReservationType } from '../../../shared/models/enums/reservation-type.enum';
 import {
@@ -37,7 +40,7 @@ interface Bar {
 @Component({
   selector: 'app-admin-reservations-page',
   standalone: true,
-  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe, StatusBadgeComponent],
+  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe, StatusBadgeComponent, ImgFallbackDirective],
   templateUrl: './admin-reservations.page.html',
   styleUrl: './admin-reservations.page.scss'
 })
@@ -53,6 +56,9 @@ export class AdminReservationsPage implements OnInit {
   readonly statusLabel = statusLabel;
   readonly typeLabel = typeLabel;
   readonly typeIcon = typeIcon;
+  /** Trip cover photo (404 when the admin did not upload one: appImgFallback shows a generic photo). */
+  readonly tripCover = (tripId: number | null) => tripCoverUrl(tripId) ?? typeImage('TRIP');
+  readonly tripFallback = typeImage('TRIP');
   readonly formatDay = formatDay;
   readonly nextStatuses = (status: ReservationStatus) => NEXT_STATUSES[status] ?? [];
 

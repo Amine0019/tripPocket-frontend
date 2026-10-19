@@ -5,6 +5,9 @@
   <section class="page container split-layout">
     <div class="stack">
       <div class="card pad">
+        <div class="banner">
+          <img [src]="photo()" [appImgFallback]="fallbackPhoto()" [alt]="title()" />
+        </div>
         <div class="head">
           <span class="icon" aria-hidden="true">{{ typeIcon(item.type) }}</span>
           <div>
@@ -57,7 +60,9 @@
 
     <aside class="card pad trip">
       @if (trip(); as trip) {
-        <img [src]="trip.image" [alt]="trip.title" />
+        @if (item.type !== 'TRIP') {
+          <img [src]="tripPhoto()" [appImgFallback]="tripFallback" [alt]="trip.title" />
+        }
         <h3>{{ trip.title }}</h3>
         <p class="muted">{{ trip.destination }}</p>
         @if (item.tripStartDate && item.tripEndDate) {
@@ -65,6 +70,9 @@
         }
         <a class="btn btn-primary" [routerLink]="['/trips', trip.id]">View trip</a>
       } @else {
+        @if (item.type !== 'TRIP') {
+          <img [src]="tripPhoto()" [appImgFallback]="tripFallback" [alt]="item.tripTitle" />
+        }
         <h3>{{ item.tripTitle }}</h3>
         @if (item.tripDestination) { <p class="muted">{{ item.tripDestination }}</p> }
       }

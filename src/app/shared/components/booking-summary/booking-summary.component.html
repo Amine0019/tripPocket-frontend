@@ -1,5 +1,5 @@
 <article>
-  <img [src]="trip.image" [alt]="trip.title" />
+  <img [src]="trip.image" [appImgFallback]="fallbackPhoto" [alt]="trip.title" />
   <div>
     <strong>{{ trip.title }}</strong>
     <p>

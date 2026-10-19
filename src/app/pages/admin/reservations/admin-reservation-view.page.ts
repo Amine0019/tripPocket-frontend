@@ -7,20 +7,23 @@ import {
   errorMessage,
   formatDay,
   paymentLabel,
+  reservationPhoto,
   statusLabel,
   typeIcon,
+  typeImage,
   typeLabel
 } from '../../../core/services/reservation.mapper';
 import { ReservationService } from '../../../core/services/reservation.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { ImgFallbackDirective } from '../../../shared/directives/img-fallback.directive';
 import { ReservationStatus } from '../../../shared/models/enums/reservation-status.enum';
 import { ReservationResponse } from '../../../shared/models/reservation.model';
 
 @Component({
   selector: 'app-admin-reservation-view-page',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe, DatePipe, StatusBadgeComponent],
+  imports: [RouterLink, CurrencyPipe, DatePipe, StatusBadgeComponent, ImgFallbackDirective],
   templateUrl: './admin-reservation-view.page.html',
   styleUrl: './admin-reservation-view.page.scss'
 })
@@ -32,6 +35,8 @@ export class AdminReservationViewPage implements OnInit {
 
   readonly typeLabel = typeLabel;
   readonly typeIcon = typeIcon;
+  readonly photo = (r: ReservationResponse) => reservationPhoto(r.type, r.tripId);
+  readonly fallbackPhoto = (r: ReservationResponse) => typeImage(r.type);
   readonly paymentLabel = paymentLabel;
   readonly statusLabel = statusLabel;
   readonly formatDay = formatDay;

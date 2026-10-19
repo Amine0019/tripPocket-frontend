@@ -87,7 +87,10 @@
           <ol class="top">
             @for (t of s.topTrips; track t.tripId; let i = $index) {
               <li>
-                <span class="rank">{{ i + 1 }}</span>
+                <span class="rank-photo">
+                  <img [src]="tripCover(t.tripId)" [appImgFallback]="tripFallback" alt="" loading="lazy" />
+                  <span class="rank">{{ i + 1 }}</span>
+                </span>
                 <div>
                   <a [routerLink]="['/admin/trips', t.tripId]">{{ t.tripTitle }}</a>
                   <small>{{ t.reservations }} booking{{ t.reservations === 1 ? '' : 's' }} · {{ t.travelers }} traveler{{ t.travelers === 1 ? '' : 's' }}</small>

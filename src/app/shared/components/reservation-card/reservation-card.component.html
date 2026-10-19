@@ -1,5 +1,8 @@
 <article class="row">
-  <div class="icon" aria-hidden="true">{{ typeIcon(reservation.type) }}</div>
+  <div class="thumb" aria-hidden="true">
+    <img [src]="photo" [appImgFallback]="fallbackPhoto" alt="" loading="lazy" />
+    <span class="type-badge">{{ typeIcon(reservation.type) }}</span>
+  </div>
   <div class="main">
     <strong>{{ title }}</strong>
     <p>

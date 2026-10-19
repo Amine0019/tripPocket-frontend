@@ -51,10 +51,13 @@
 .hbars b { text-align: right; }
 
 .top { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-.top li { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: center; font-size: 13px; }
+.top li { display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; font-size: 13px; }
+.rank-photo { position: relative; width: 52px; height: 40px; }
+.rank-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block; background: var(--teal-soft); }
 .rank {
-  width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
-  background: var(--teal-soft); color: var(--teal-deep); font-weight: 700; font-size: 12px;
+  position: absolute; left: -6px; top: -6px;
+  width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; border: 2px solid #fff;
+  background: var(--teal-soft); color: var(--teal-deep); font-weight: 700; font-size: 11px;
 }
 .top a { color: var(--ink); font-weight: 600; display: block; }
 .top small { color: var(--muted); }
@@ -112,7 +115,10 @@
   text-align: left; padding: 12px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
   color: var(--muted); background: #f8fbfa; border-bottom: 1px solid var(--line);
 }
-.res-table td { padding: 12px 14px; border-bottom: 1px solid #eef3f2; vertical-align: middle; }
+.res-table td { padding: 12px 10px; border-bottom: 1px solid #eef3f2; vertical-align: middle; }
+.res-table th { padding: 12px 10px; }
+.res-table th:first-child, .res-table td:first-child { padding-left: 14px; }
+.res-table th:last-child, .res-table td:last-child { padding-right: 14px; }
 .res-table tr:last-child td { border-bottom: 0; }
 .res-table tr.busy { opacity: .5; }
 .res-table small { display: block; color: var(--muted); font-size: 12px; }
@@ -126,10 +132,11 @@
 }
 .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; white-space: nowrap; }
 .nowrap { white-space: nowrap; }
-.trip-cell { min-width: 140px; }
+.trip-cell { min-width: 120px; }
 .row-actions { display: inline-flex; align-items: center; gap: 6px; }
 .status-select {
-  border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; font-size: 12px; background: #fff; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 10px; padding: 6px 6px; font-size: 12px; background: #fff; color: var(--ink);
+  max-width: 100px;
 }
 .action-btn {
   width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--line); background: #fff; cursor: pointer;

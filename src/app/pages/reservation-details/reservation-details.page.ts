@@ -9,7 +9,10 @@ import {
   paymentLabel,
   recordDateLabel,
   recordTitle,
+  reservationPhoto,
+  tripCoverUrl,
   typeIcon,
+  typeImage,
   typeLabel
 } from '../../core/services/reservation.mapper';
 import { ReservationService } from '../../core/services/reservation.service';
@@ -19,6 +22,7 @@ import { LoadingComponent } from '../../shared/components/loading/loading.compon
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { ReservationAiAssistantComponent } from '../../shared/components/reservation-ai-assistant/reservation-ai-assistant.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { ImgFallbackDirective } from '../../shared/directives/img-fallback.directive';
 import { ReservationStatus } from '../../shared/models/enums/reservation-status.enum';
 import { ReservationRecord } from '../../shared/models/reservation.model';
 
@@ -30,7 +34,8 @@ interface TimelineStep {
 @Component({
   selector: 'app-reservation-details-page',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, RouterLink, StatusBadgeComponent, ModalComponent, LoadingComponent, ReservationAiAssistantComponent],
+  imports: [CurrencyPipe, DatePipe, RouterLink, StatusBadgeComponent, ModalComponent, LoadingComponent, ReservationAiAssistantComponent,
+    ImgFallbackDirective],
   templateUrl: './reservation-details.page.html',
   styleUrl: './reservation-details.page.scss'
 })
@@ -64,6 +69,18 @@ export class ReservationDetailsPage implements OnInit {
     const item = this.reservation();
     return item ? this.store.tripById(item.tripId) : undefined;
   });
+  /** Banner: the trip cover for a trip package, a photo of the service (hotel, restaurant...) otherwise. */
+  readonly photo = computed(() => {
+    const item = this.reservation();
+    return item ? reservationPhoto(item.type, item.tripId, this.trip()?.image) : typeImage(null);
+  });
+  readonly fallbackPhoto = computed(() => typeImage(this.reservation()?.type));
+  /** Trip photo of the side card (works even when the trip is not in the store). */
+  readonly tripPhoto = computed(() => {
+    const item = this.reservation();
+    return this.trip()?.image ?? tripCoverUrl(item?.tripId) ?? typeImage('TRIP');
+  });
+  readonly tripFallback = typeImage('TRIP');
   readonly cancellable = computed(() => {
     const status = this.reservation()?.status;
     return status === ReservationStatus.PENDING || status === ReservationStatus.CONFIRMED;
