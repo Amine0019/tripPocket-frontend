@@ -5,6 +5,9 @@ export const MOCK_USER: User = {
   firstName: 'Alex',
   lastName: 'Morgan',
   email: 'alex.morgan@email.com',
+  phone: '',
+  country: '',
+  language: 'English',
   avatarInitials: 'AM',
   memberSince: 'March 2023',
   role: 'TRAVELER'

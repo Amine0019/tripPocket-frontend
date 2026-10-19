@@ -1,75 +1,94 @@
 <section class="page container">
   <app-page-header eyebrow="Budget" title="Expenses" subtitle="Track spend by trip, category, and payment method.">
-    <button class="btn btn-primary" type="button" (click)="open.set(true)">Add expense</button>
+    <button class="btn btn-primary" type="button" (click)="startNew()">Add expense</button>
   </app-page-header>
 
-  <div class="stat-row" style="margin-bottom:22px">
-    <div class="stat-box"><span>Visible total</span><strong>{{ total() | currency:'USD':'symbol':'1.0-0' }}</strong></div>
-    <div class="stat-box"><span>Food</span><strong>{{ totals().FOOD | currency:'USD':'symbol':'1.0-0' }}</strong></div>
-    <div class="stat-box"><span>Stay</span><strong>{{ totals().ACCOMMODATION | currency:'USD':'symbol':'1.0-0' }}</strong></div>
-    <div class="stat-box"><span>Activities</span><strong>{{ totals().ACTIVITIES | currency:'USD':'symbol':'1.0-0' }}</strong></div>
-  </div>
+  @if (error()) {
+    <div class="card error-state"><p>{{ error() }}</p><button class="btn btn-outline" type="button" (click)="load()">Try again</button></div>
+  } @else {
+    <div class="stat-row" style="margin-bottom:22px">
+      <div class="stat-box"><span>Visible total</span><strong>{{ total() | currency:'USD':'symbol':'1.0-0' }}</strong></div>
+      <div class="stat-box"><span>Food</span><strong>{{ totals()['FOOD'] | currency:'USD':'symbol':'1.0-0' }}</strong></div>
+      <div class="stat-box"><span>Stay</span><strong>{{ totals()['ACCOMMODATION'] | currency:'USD':'symbol':'1.0-0' }}</strong></div>
+      <div class="stat-box"><span>Activities</span><strong>{{ totals()['ACTIVITIES'] | currency:'USD':'symbol':'1.0-0' }}</strong></div>
+    </div>
 
-  <div class="page-toolbar">
-    <div class="pills">
-      @for (item of categories; track item) {
-        <button class="pill" type="button" [class.active]="category() === item" (click)="category.set(item)">
-          {{ item === 'ALL' ? 'All' : item.charAt(0) + item.slice(1).toLowerCase() }}
-        </button>
+    <div class="page-toolbar">
+      <div class="pills">
+        @for (item of categories; track item) {
+          <button class="pill" type="button" [class.active]="category() === item" (click)="category.set(item)">
+            {{ item === 'ALL' ? 'All' : item.charAt(0) + item.slice(1).toLowerCase() }}
+          </button>
+        }
+      </div>
+      <select class="input" aria-label="Filter by trip" style="max-width:240px" [ngModel]="tripId()" (ngModelChange)="tripId.set($event)">
+        <option value="">All trips</option>
+        @for (trip of trips(); track trip.id) { <option [value]="trip.id">{{ trip.destination }}</option> }
+      </select>
+    </div>
+
+    <div class="card pad">
+      @if (loading()) {
+        <p class="muted loading">Loading expenses…</p>
+      } @else if (items().length) {
+        @for (expense of items(); track expense.id) {
+          <div class="line">
+            <app-expense-card [expense]="expense" />
+            <div class="actions">
+              <button class="ghost" type="button" (click)="edit(expense)">Edit</button>
+              <button class="ghost" type="button" (click)="remove(expense.id)">Remove</button>
+            </div>
+          </div>
+        }
+      } @else {
+        <app-empty-state title="No expenses" [message]="trips().length ? 'Add a meal, stay, or ticket to start tracking.' : 'Create a trip before adding an expense.'" />
       }
     </div>
-    <select class="input" style="max-width:240px" [(ngModel)]="tripFilter" (ngModelChange)="tripId.set($event)">
-      <option value="">All trips</option>
-      @for (trip of trips(); track trip.id) {
-        <option [value]="trip.id">{{ trip.title }}</option>
-      }
-    </select>
-  </div>
-
-  <div class="card pad">
-    @if (items().length) {
-      @for (expense of items(); track expense.id) {
-        <div class="line">
-          <app-expense-card [expense]="expense" />
-          <button class="ghost" type="button" (click)="remove(expense.id)">Remove</button>
-        </div>
-      }
-    } @else {
-      <app-empty-state title="No expenses" message="Add a meal, stay, or ticket to start tracking." />
-    }
-  </div>
+  }
 </section>
 
-<app-modal [open]="open()" (closed)="open.set(false)">
-  <h2>New expense</h2>
-  <div class="form-grid" style="margin-top:16px">
-    <label class="field span-2"><span>Title</span><input class="input" [(ngModel)]="form.title" name="title" /></label>
-    <label class="field">
-      <span>Category</span>
-      <select class="input" [(ngModel)]="form.category" name="category">
-        @for (item of categories; track item) {
-          @if (item !== 'ALL') { <option [value]="item">{{ item }}</option> }
-        }
-      </select>
-    </label>
-    <label class="field"><span>Amount</span><input class="input" type="number" [(ngModel)]="form.amount" name="amount" /></label>
-    <label class="field">
-      <span>Payment</span>
-      <select class="input" [(ngModel)]="form.paymentMethod" name="pay">
-        @for (method of methods; track method) { <option [value]="method">{{ method }}</option> }
-      </select>
-    </label>
-    <label class="field"><span>Date</span><input class="input" type="date" [(ngModel)]="form.date" name="date" /></label>
-    <label class="field span-2">
-      <span>Trip</span>
-      <select class="input" [(ngModel)]="form.tripId" name="trip">
-        @for (trip of trips(); track trip.id) { <option [value]="trip.id">{{ trip.title }}</option> }
-      </select>
-    </label>
-    <label class="field span-2"><span>Notes</span><textarea class="input" rows="3" [(ngModel)]="form.description" name="desc"></textarea></label>
-  </div>
-  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
-    <button class="btn btn-outline" type="button" (click)="open.set(false)">Close</button>
-    <button class="btn btn-primary" type="button" (click)="save()" [disabled]="!form.title || !form.amount">Save</button>
-  </div>
+<app-modal [open]="open()" (closed)="close()">
+  <h2>{{ editingId() ? 'Edit expense' : 'New expense' }}</h2>
+  @if (!trips().length) {
+    <p class="muted">An expense must belong to a trip. Create or book a trip first, then you can add its expenses here.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" type="button" (click)="close()">Close</button>
+      <a class="btn btn-primary" routerLink="/trips" (click)="close()">Explore trips</a>
+    </div>
+  } @else {
+  <form #expenseForm="ngForm" (ngSubmit)="save()">
+    <div class="form-grid" style="margin-top:16px">
+      <label class="field span-2"><span>Title</span><input class="input" [(ngModel)]="form.title" name="title" required maxlength="120" #title="ngModel" />
+        @if (title.invalid && title.touched) { <small class="validation">Enter an expense title.</small> }
+      </label>
+      <label class="field">
+        <span>Category</span>
+        <select class="input" [(ngModel)]="form.category" name="category" required>
+          @for (item of categories; track item) { @if (item !== 'ALL') { <option [value]="item">{{ item }}</option> } }
+        </select>
+      </label>
+      <label class="field"><span>Amount (USD)</span><input class="input" type="number" [(ngModel)]="form.amount" name="amount" required min="0.01" step="0.01" #amount="ngModel" />
+        @if (amount.invalid && amount.touched) { <small class="validation">Amount must be greater than zero.</small> }
+      </label>
+      <label class="field">
+        <span>Payment</span>
+        <select class="input" [(ngModel)]="form.paymentMethod" name="paymentMethod" required>
+          @for (method of methods; track method) { <option [value]="method">{{ method.replace('_', ' ') }}</option> }
+        </select>
+      </label>
+      <label class="field"><span>Date</span><input class="input" type="date" [(ngModel)]="form.date" name="date" required /></label>
+      <label class="field span-2">
+        <span>Trip</span>
+        <select class="input" [(ngModel)]="form.tripId" name="trip" required [disabled]="!!editingId()">
+          @for (trip of trips(); track trip.id) { <option [value]="trip.id">{{ trip.destination }}</option> }
+        </select>
+      </label>
+      <label class="field span-2"><span>Notes</span><textarea class="input" rows="3" [(ngModel)]="form.description" name="description" maxlength="1000"></textarea></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" type="button" (click)="close()">Close</button>
+      <button class="btn btn-primary" type="submit" [disabled]="expenseForm.invalid || saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+    </div>
+  </form>
+  }
 </app-modal>

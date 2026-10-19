@@ -1,3 +1,9 @@
 .pad { padding: 8px 20px 16px; }
 .line { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; border-bottom: 1px solid #eef3f2; }
 .ghost { background: none; border: 0; color: var(--muted); font-weight: 600; }
+.actions { display: flex; gap: 12px; }
+.error-state { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; color: #a33; }
+.error-state p, .loading { margin: 0; }
+.loading { padding: 20px 0; }
+.validation { color: #a33; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }

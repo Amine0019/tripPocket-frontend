@@ -175,6 +175,12 @@ export class TravelStore {
     switch (method) {
       case 'CARD':
         return 'Visa •••• 2841';
+      case 'CREDIT_CARD':
+        return 'Credit card';
+      case 'DEBIT_CARD':
+        return 'Debit card';
+      case 'ONLINE_PAYMENT':
+        return 'Online payment';
       case 'PAYPAL':
         return 'PayPal';
       case 'CASH':
