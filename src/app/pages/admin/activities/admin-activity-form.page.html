@@ -1,0 +1,70 @@
+<section class="form-page">
+  <a class="back-link" routerLink="/admin/activities">← Activities</a>
+  <header class="form-heading">
+    <p class="eyebrow">Administration</p>
+    <h2>New Activity</h2>
+    <p>Plan an activity and attach it to one of your trips.</p>
+  </header>
+
+  @if (loadingTrips()) {
+    <div class="notice">Loading trips...</div>
+  } @else if (error() && !trips().length) {
+    <div class="error-box">{{ error() }}</div>
+  } @else if (!trips().length) {
+    <div class="notice">Create a trip first, then you can attach activities to it.</div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="activity-form">
+      @if (error()) { <div class="error-box">{{ error() }}</div> }
+      <div class="form-card">
+        <h3>Activity details</h3>
+        <div class="form-grid">
+          <label class="field span-2">
+            <span>Trip <i>*</i></span>
+            <select formControlName="tripId" class="input">
+              <option [ngValue]="null" disabled>Select a trip</option>
+              @for (trip of trips(); track trip.id) {
+                <option [ngValue]="trip.id">{{ trip.title || trip.destination }} — {{ trip.destination }}</option>
+              }
+            </select>
+            @if (form.controls.tripId.touched && form.controls.tripId.invalid) { <small>Select a trip.</small> }
+          </label>
+          <label class="field">
+            <span>Name <i>*</i></span>
+            <input class="input" formControlName="name" placeholder="e.g. Guided medina walking tour" />
+            @if (form.controls.name.touched && form.controls.name.invalid) { <small>Enter a name of up to 120 characters.</small> }
+          </label>
+          <label class="field">
+            <span>Category <i>*</i></span>
+            <select class="input" formControlName="category">
+              @for (category of categories; track category) { <option [ngValue]="category">{{ category }}</option> }
+            </select>
+          </label>
+          <label class="field">
+            <span>Date and time <i>*</i></span>
+            <input class="input" type="datetime-local" formControlName="activityDate" />
+            @if (form.controls.activityDate.touched && form.controls.activityDate.invalid) { <small>Choose a date and time.</small> }
+          </label>
+          <label class="field">
+            <span>Estimated cost (USD)</span>
+            <input class="input" type="number" min="0" step="0.01" formControlName="estimatedCost" />
+            @if (form.controls.estimatedCost.touched && form.controls.estimatedCost.invalid) { <small>Cost cannot be negative.</small> }
+          </label>
+          <label class="field span-2">
+            <span>Location</span>
+            <input class="input" formControlName="location" placeholder="City or venue" />
+          </label>
+          <label class="field span-2">
+            <span>Description</span>
+            <textarea class="input textarea" rows="4" formControlName="description" placeholder="What will travelers experience?"></textarea>
+          </label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <a class="btn btn-outline" routerLink="/admin/activities">Cancel</a>
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Creating...' : 'Create Activity' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

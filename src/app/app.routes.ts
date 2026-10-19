@@ -27,6 +27,8 @@ import { AdminTripFormPage } from './pages/admin/trips/admin-trip-form.page';
 import { AdminTripViewPage } from './pages/admin/trips/admin-trip-view.page';
 import { AdminReservationsPage } from './pages/admin/reservations/admin-reservations.page';
 import { AdminReservationViewPage } from './pages/admin/reservations/admin-reservation-view.page';
+import { AdminActivitiesPage } from './pages/admin/activities/admin-activities.page';
+import { AdminActivityFormPage } from './pages/admin/activities/admin-activity-form.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'trips', pathMatch: 'full' },
@@ -56,6 +58,8 @@ export const routes: Routes = [
       { path: 'users/:id/edit', component: AdminUserFormPage },
       { path: 'trips', component: AdminTripsPage },
       { path: 'trips/new', component: AdminTripFormPage },
+      { path: 'activities', component: AdminActivitiesPage },
+      { path: 'activities/new', component: AdminActivityFormPage },
       { path: 'reservations', component: AdminReservationsPage },
       { path: 'reservations/:id', component: AdminReservationViewPage },
       { path: 'trips/:id', component: AdminTripViewPage },
