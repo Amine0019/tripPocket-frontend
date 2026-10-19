@@ -41,18 +41,11 @@ h1 { margin: 0 0 8px; font-family: var(--serif); font-size: 36px; }
 }
 .type-option.active .type-icon { background: #fff; }
 
-.ai-box {
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #f1f8f6, #fbf4ee);
-  border: 1px solid var(--teal-line);
+.chat-hint {
+  margin: 10px 0 0; padding: 9px 12px; border-radius: 12px;
+  background: var(--teal-soft); color: var(--teal-deep); font-size: 13px; font-weight: 600;
 }
-.ai-box .field > span { color: var(--teal-deep); font-weight: 700; }
-.ai-row { display: flex; gap: 8px; }
-.ai-row .input { background: #fff; }
-.ai-row .btn { white-space: nowrap; }
-.ai-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+.booking-aside { display: grid; gap: 16px; align-content: start; }
 
 .review { display: grid; gap: 10px; margin: 18px 0 0; }
 .review div { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
@@ -72,7 +65,11 @@ h1 { margin: 0 0 8px; font-family: var(--serif); font-size: 36px; }
 
 button[disabled] { opacity: .55; cursor: not-allowed; transform: none; }
 
+@media (max-width: 900px) {
+  // on phones the assistant comes first, above the form
+  .booking-aside { order: -1; }
+}
+
 @media (max-width: 700px) {
   .type-grid { grid-template-columns: 1fr 1fr; }
-  .ai-row { flex-direction: column; }
 }

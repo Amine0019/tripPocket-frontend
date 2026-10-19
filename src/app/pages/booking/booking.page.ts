@@ -18,10 +18,10 @@ import { ToastService } from '../../core/services/toast.service';
 import { TravelStore } from '../../core/services/travel.store';
 import { BookingStepperComponent } from '../../shared/components/booking-stepper/booking-stepper.component';
 import { BookingSummaryComponent } from '../../shared/components/booking-summary/booking-summary.component';
+import { ReservationChatComponent } from '../../shared/components/reservation-chat/reservation-chat.component';
 import { PaymentMethod } from '../../shared/models/enums/payment-method.enum';
 import { ReservationType } from '../../shared/models/enums/reservation-type.enum';
 import {
-  ParsedReservationRequest,
   ReservationAvailability,
   ReservationRecord,
   ReservationRequest
@@ -32,7 +32,7 @@ const MAX_TRAVELERS = 20;
 @Component({
   selector: 'app-booking-page',
   standalone: true,
-  imports: [FormsModule, CurrencyPipe, RouterLink, BookingStepperComponent, BookingSummaryComponent],
+  imports: [FormsModule, CurrencyPipe, RouterLink, BookingStepperComponent, BookingSummaryComponent, ReservationChatComponent],
   templateUrl: './booking.page.html',
   styleUrl: './booking.page.scss'
 })
@@ -58,11 +58,6 @@ export class BookingPage implements OnInit {
   readonly error = signal<string | null>(null);
   readonly created = signal<ReservationRecord | null>(null);
   readonly availability = signal<ReservationAvailability | null>(null);
-
-  // "Describe your booking in one sentence" (AI)
-  readonly aiText = signal('');
-  readonly aiLoading = signal(false);
-  readonly aiResult = signal<ParsedReservationRequest | null>(null);
 
   readonly trip = computed(() => this.store.tripById(this.draft().tripId));
   readonly user = this.store.user;
@@ -185,34 +180,17 @@ export class BookingPage implements OnInit {
     });
   }
 
-  /** Sends the sentence to the AI and pre-fills the form. The traveler still checks and confirms. */
-  fillWithAi(): void {
-    const text = this.aiText().trim();
-    if (!text || this.isDemoTrip()) return;
-    this.aiLoading.set(true);
-    this.aiResult.set(null);
-    this.reservationService.parseRequest({ tripId: Number(this.draft().tripId), text }).subscribe({
-      next: (result) => {
-        this.aiLoading.set(false);
-        this.aiResult.set(result);
-        const patch: Partial<BookingDraft> = {};
-        if (result.type) patch.reservationType = result.type;
-        if (result.travelers) patch.travelers = Math.min(Math.max(1, result.travelers), MAX_TRAVELERS);
-        if (result.reservationDate) patch.reservationDate = result.reservationDate;
-        if (result.paymentMethod) patch.paymentMethod = result.paymentMethod;
-        if (result.price != null) patch.amount = result.price;
-        if (result.notes) patch.notes = result.notes;
-        if (patch.reservationType === ReservationType.TRIP) {
-          patch.reservationDate = '';
-          patch.amount = null;
-        }
-        this.booking.patch(patch);
-      },
-      error: (err: unknown) => {
-        this.aiLoading.set(false);
-        this.toast.show('AI unavailable', errorMessage(err, 'Fill in the form manually.'));
-      }
-    });
+  /** The booking assistant filled everything: check the fields and go to the review step. */
+  goReview(): void {
+    const stepOne = this.validateStep(1);
+    const stepThree = this.validateStep(3);
+    if (stepOne || stepThree) {
+      this.step.set(stepOne ? 1 : 3);
+      this.error.set(stepOne ?? stepThree);
+      return;
+    }
+    this.error.set(null);
+    this.step.set(5);
   }
 
   goReservations(): void {

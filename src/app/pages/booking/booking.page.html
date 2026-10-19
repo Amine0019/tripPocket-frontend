@@ -15,6 +15,7 @@
           @case (1) {
             <h1>Trip dates</h1>
             <p class="muted">Check when the trip runs and how many people are travelling.</p>
+            <p class="chat-hint">✦ Prefer to chat? Tell the booking assistant what you need: it fills in the form for you.</p>
             <div class="facts">
               <div><span>Dates</span><b>{{ tripDates() }}</b></div>
               <div><span>Price</span><b>{{ trip.pricePerPerson | currency:'USD':'symbol':'1.0-0' }} / person</b></div>
@@ -44,30 +45,6 @@
           }
           @case (3) {
             <h1>What do you want to book?</h1>
-
-            <div class="ai-box">
-              <label class="field">
-                <span>✦ Describe your booking in one sentence</span>
-                <div class="ai-row">
-                  <input class="input" [ngModel]="aiText()" (ngModelChange)="aiText.set($event)" name="aiText"
-                         maxlength="300" placeholder="e.g. 2 nights in a hotel on day 2 for 2 people, around $150"
-                         (keyup.enter)="fillWithAi()" [disabled]="isDemoTrip()" />
-                  <button class="btn btn-outline" type="button" (click)="fillWithAi()"
-                          [disabled]="aiLoading() || !aiText().trim() || isDemoTrip()">
-                    {{ aiLoading() ? 'Reading…' : 'Fill with AI' }}
-                  </button>
-                </div>
-              </label>
-              @if (aiResult(); as ai) {
-                <p class="ai-note">
-                  @if (ai.aiAvailable) {
-                    Form pre-filled ({{ (ai.confidence * 100).toFixed(0) }}% sure). Check every field before continuing.
-                  } @else {
-                    {{ ai.message || 'AI is not available right now, please fill in the form.' }}
-                  }
-                </p>
-              }
-            </div>
 
             <div class="type-grid">
               @for (type of types; track type) {
@@ -160,8 +137,15 @@
           </div>
         }
       </div>
-      <app-booking-summary [trip]="trip" [travelers]="draft().travelers" [dates]="summaryDates()"
-                           [label]="typeLabel(draft().reservationType)" [amount]="total()" />
+      <aside class="booking-aside">
+        <app-booking-summary [trip]="trip" [travelers]="draft().travelers" [dates]="summaryDates()"
+                             [label]="typeLabel(draft().reservationType)" [amount]="total()" />
+        @if (step() < 6) {
+          <app-reservation-chat [tripId]="draft().tripId" [tripTitle]="trip.title" [firstName]="user().firstName"
+                                [disabledReason]="isDemoTrip() ? 'Demo trip: choose a trip created by an admin to use the assistant.' : null"
+                                (review)="goReview()" />
+        }
+      </aside>
     </div>
   </section>
 } @else {
