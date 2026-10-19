@@ -1,4 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { IMG } from '../data/images';
 import {
   PaymentMethod as ViewPaymentMethod,
   Reservation as ViewReservation,
@@ -64,6 +66,16 @@ const TYPE_ICONS: Record<ReservationType, string> = {
   [ReservationType.ACTIVITY]: '◇'
 };
 
+/** Photo shown when a trip has no cover image yet (one per kind of booking). */
+const TYPE_IMAGES: Record<ReservationType, string> = {
+  [ReservationType.TRIP]: IMG.nature,
+  [ReservationType.HOTEL]: IMG.hotel,
+  [ReservationType.FLIGHT]: IMG.hero,
+  [ReservationType.TRAIN]: IMG.train,
+  [ReservationType.RESTAURANT]: IMG.food,
+  [ReservationType.ACTIVITY]: IMG.adventure
+};
+
 const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   [PaymentMethod.CREDIT_CARD]: 'Credit card',
   [PaymentMethod.DEBIT_CARD]: 'Debit card',
@@ -77,6 +89,30 @@ export function typeLabel(type: ReservationType | string | null | undefined): st
 
 export function typeIcon(type: ReservationType | string | null | undefined): string {
   return type ? TYPE_ICONS[type as ReservationType] ?? '◇' : '◇';
+}
+
+export function typeImage(type: ReservationType | string | null | undefined): string {
+  return (type && TYPE_IMAGES[type as ReservationType]) || IMG.nature;
+}
+
+/**
+ * Cover photo of a trip saved in the backend (GET /trips/{id}/cover-image, public).
+ * The endpoint answers 404 when the admin did not upload a photo: pair it with appImgFallback.
+ */
+export function tripCoverUrl(tripId: string | number | null | undefined): string | null {
+  return isBackendId(tripId) ? `${environment.apiUrl}/trips/${tripId}/cover-image` : null;
+}
+
+/** Photo of a reservation: the trip cover for a trip package, a photo of the service otherwise. */
+export function reservationPhoto(
+  type: ReservationType | string | null | undefined,
+  tripId: string | number | null | undefined,
+  tripImage?: string | null
+): string {
+  if (type === ReservationType.TRIP) {
+    return tripCoverUrl(tripId) ?? tripImage ?? typeImage(type);
+  }
+  return typeImage(type);
 }
 
 export function paymentLabel(method: PaymentMethod | string | null | undefined): string {

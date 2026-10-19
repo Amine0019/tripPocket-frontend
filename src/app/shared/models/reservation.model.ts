@@ -161,6 +161,41 @@ export interface ParsedReservationRequest {
   message: string | null;
 }
 
+/** POST /reservations/ai/chat — booking assistant (nothing is saved). */
+export interface BookingChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+/** Booking fields collected by the assistant (null = not known yet). */
+export interface BookingChatState {
+  type: ReservationType | null;
+  travelers: number | null;
+  reservationDate: string | null;
+  paymentMethod: PaymentMethod | null;
+  price: number | null;
+  notes: string | null;
+}
+
+export interface BookingChatRequest {
+  tripId: number;
+  messages: BookingChatMessage[];
+  booking: BookingChatState;
+}
+
+export type BookingChatField = 'type' | 'travelers' | 'reservationDate' | 'paymentMethod';
+
+export interface BookingChatResponse {
+  aiAvailable: boolean;
+  reply: string;
+  booking: BookingChatState;
+  missing: BookingChatField[];
+  ready: boolean;
+  suggestions: string[];
+  spotsLeft: number | null;
+  warning: string | null;
+}
+
 /** POST /reservations/ai/admin-insights (admin) */
 export interface AdminInsightAlert {
   severity: AiPriority;

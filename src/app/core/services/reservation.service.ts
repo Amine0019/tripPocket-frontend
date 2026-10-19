@@ -6,6 +6,8 @@ import { ReservationStatus } from '../../shared/models/enums/reservation-status.
 import { ReservationType } from '../../shared/models/enums/reservation-type.enum';
 import {
   AdminInsightsResponse,
+  BookingChatRequest,
+  BookingChatResponse,
   ParsedReservationRequest,
   ParseRequestBody,
   ReservationAvailability,
@@ -108,6 +110,11 @@ export class ReservationService {
   /** Turns one sentence ("2 nights hotel on the 18th for 2") into booking form values. */
   parseRequest(body: ParseRequestBody): Observable<ParsedReservationRequest> {
     return this.http.post<ParsedReservationRequest>(`${this.apiUrl}/ai/parse-request`, body);
+  }
+
+  /** Booking assistant: one chat turn. The answer pre-fills the form; nothing is saved. */
+  chat(body: BookingChatRequest): Observable<BookingChatResponse> {
+    return this.http.post<BookingChatResponse>(`${this.apiUrl}/ai/chat`, body);
   }
 
   /** Summary, alerts and advice for the admin dashboard (admin only). */
