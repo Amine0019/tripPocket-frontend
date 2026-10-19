@@ -2,6 +2,7 @@
 .line { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; border-bottom: 1px solid #eef3f2; }
 .ghost { background: none; border: 0; color: var(--muted); font-weight: 600; }
 .insights { margin: 24px 0; padding: 24px; }
+.analyze-button:disabled { cursor: not-allowed; opacity: .48; filter: grayscale(.45); box-shadow: none; }
 .insights-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
 .insights-heading h2 { margin: 5px 0; }
 .insights-kicker { color: var(--primary, #168577); font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }

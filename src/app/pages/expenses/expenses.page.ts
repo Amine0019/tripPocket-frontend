@@ -4,12 +4,13 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BudgetExpense, ExpenseCategory, PaymentMethod } from '../../core/models/models';
 import { ToastService } from '../../core/services/toast.service';
-import { TravelStore } from '../../core/services/travel.store';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { ExpenseCardComponent } from '../../shared/components/expense-card/expense-card.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { environment } from '../../../environments/environment';
+import { TripService } from '../../core/services/trip.service';
+import { Trip } from '../../shared/models/trip.model';
 
 interface SpendingInsights {
   totalExpenses: number;
@@ -40,16 +41,18 @@ interface BackendExpense {
   styleUrl: './expenses.page.scss'
 })
 export class ExpensesPage {
-  private readonly store = inject(TravelStore);
   private readonly toast = inject(ToastService);
   private readonly http = inject(HttpClient);
+  private readonly tripService = inject(TripService);
 
   readonly category = signal<ExpenseCategory | 'ALL'>('ALL');
   readonly tripId = signal('');
   readonly open = signal(false);
   readonly categories: Array<ExpenseCategory | 'ALL'> = ['ALL', 'FOOD', 'ACCOMMODATION', 'TRANSPORT', 'ACTIVITIES', 'SHOPPING', 'OTHER'];
   readonly methods: PaymentMethod[] = ['CARD', 'CASH', 'PAYPAL', 'BANK_TRANSFER'];
-  readonly trips = this.store.trips;
+  readonly trips = signal<Trip[]>([]);
+  readonly tripsLoading = signal(false);
+  readonly tripsError = signal('');
   tripFilter = '';
   budgetInput = '';
   readonly insight = signal<SpendingInsights | null>(null);
@@ -81,19 +84,40 @@ export class ExpensesPage {
   readonly total = computed(() => this.items().reduce((sum, item) => sum + item.amount, 0));
 
   constructor() {
+    this.loadBackendTrips();
     this.loadExpenses();
   }
 
+  loadBackendTrips(): void {
+    this.tripsLoading.set(true);
+    this.tripsError.set('');
+    this.tripService.getAllTrips().subscribe({
+      next: (trips) => {
+        this.trips.set((trips ?? []).filter((trip) => Number.isSafeInteger(Number(trip.id)) && Number(trip.id) > 0));
+        const currentTripExists = this.trips().some((trip) => String(trip.id) === this.form.tripId);
+        if (!currentTripExists && this.trips().length) {
+          const firstTrip = this.trips()[0];
+          this.form = { ...this.form, tripId: String(firstTrip.id), tripTitle: firstTrip.title || firstTrip.destination };
+        }
+        this.tripsLoading.set(false);
+      },
+      error: () => {
+        this.tripsError.set('Could not load backend trips. Check your connection and retry.');
+        this.tripsLoading.set(false);
+      }
+    });
+  }
+
   emptyForm(): Omit<BudgetExpense, 'id'> {
-    const trip = this.store.trips()[0];
+    const trip = this.trips()[0];
     return {
       title: '',
       category: 'FOOD',
       amount: 0,
       paymentMethod: 'CARD',
       date: new Date().toISOString().slice(0, 10),
-      tripId: trip?.id ?? '',
-      tripTitle: trip?.title ?? '',
+      tripId: trip ? String(trip.id) : '',
+      tripTitle: trip?.title || trip?.destination || '',
       description: ''
     };
   }
@@ -139,11 +163,9 @@ export class ExpensesPage {
 
   openExpenseForm(): void {
     this.expenseFormError.set('');
-    const trip = this.isBackendTripId(this.form.tripId)
-      ? this.store.tripById(this.form.tripId)
-      : this.trips().find((item) => this.isBackendTripId(item.id));
+    const trip = this.trips().find((item) => String(item.id) === this.form.tripId) ?? this.trips()[0];
     if (trip) {
-      this.form = { ...this.form, tripId: trip.id, tripTitle: trip.title };
+      this.form = { ...this.form, tripId: String(trip.id), tripTitle: trip.title || trip.destination };
     } else {
       this.expenseFormError.set('No backend trips are available. Create a trip in the backend before adding expenses.');
     }
@@ -171,8 +193,8 @@ export class ExpensesPage {
       : `${environment.apiUrl}/expenses`;
     this.http.get<BackendExpense[]>(url).subscribe({
       next: (expenses) => {
-        const trip = tripId ? this.store.tripById(String(tripId)) : undefined;
-        this.expenseItems.set(expenses.map((expense) => this.toViewExpense(expense, tripId, trip?.title ?? '')));
+        const trip = tripId ? this.trips().find((item) => item.id === tripId) : undefined;
+        this.expenseItems.set(expenses.map((expense) => this.toViewExpense(expense, tripId, trip?.title || trip?.destination || '')));
         this.expensesLoading.set(false);
       },
       error: () => {

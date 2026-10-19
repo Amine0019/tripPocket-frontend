@@ -21,17 +21,24 @@
     <select class="input" style="max-width:240px" [ngModel]="tripFilter" (ngModelChange)="selectTrip($event)">
       <option value="">All trips</option>
       @for (trip of trips(); track trip.id) {
-        <option [value]="trip.id">{{ trip.title }}</option>
+        <option [value]="trip.id">{{ trip.title || trip.destination }}</option>
       }
     </select>
   </div>
+  @if (tripsError()) {
+    <div class="insight-error" role="alert"><span>{{ tripsError() }}</span><button class="ghost" type="button" (click)="loadBackendTrips()">Retry</button></div>
+  } @else if (tripsLoading()) {
+    <p class="insight-message" role="status">Loading trips from the backend…</p>
+  } @else if (!trips().length) {
+    <p class="insight-message">No backend trips found. Create a trip before adding expenses or analyzing spending.</p>
+  }
 
   <section class="insights card pad" aria-labelledby="insights-title">
     <div class="insights-heading">
       <div><span class="insights-kicker">AI spending insights</span><h2 id="insights-title">Understand your trip spend</h2>
         <p class="muted">Insights use expenses saved for the selected backend trip.</p></div>
-      <button class="btn btn-primary" type="button" (click)="loadInsights()" [disabled]="insightLoading() || !backendTripId">
-        {{ insightLoading() ? 'Analyzing…' : insight() ? 'Analyze again' : 'Analyze my spending' }}
+      <button class="btn btn-primary analyze-button" type="button" (click)="loadInsights()" [disabled]="insightLoading() || !backendTripId" [attr.title]="!backendTripId ? 'Select a saved trip above first' : null">
+        {{ insightLoading() ? 'Analyzing…' : !backendTripId ? 'Select a trip first' : insight() ? 'Analyze again' : 'Analyze my spending' }}
       </button>
     </div>
     @if (!backendTripId) {
@@ -116,7 +123,7 @@
     <label class="field span-2">
       <span>Trip</span>
       <select class="input" [(ngModel)]="form.tripId" name="trip" (ngModelChange)="expenseFormError.set('')">
-        @for (trip of trips(); track trip.id) { <option [value]="trip.id">{{ trip.title }}</option> }
+        @for (trip of trips(); track trip.id) { <option [value]="trip.id">{{ trip.title || trip.destination }}</option> }
       </select>
     </label>
     <label class="field span-2"><span>Notes</span><textarea class="input" rows="3" [(ngModel)]="form.description" name="desc"></textarea></label>
