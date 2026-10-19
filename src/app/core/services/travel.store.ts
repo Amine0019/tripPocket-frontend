@@ -3,8 +3,10 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, map, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Trip as BackendTrip } from '../../shared/models/trip.model';
+import { Activity as BackendActivity } from '../../shared/models/activity.model';
 import { ReservationRecord, ReservationRequest } from '../../shared/models/reservation.model';
 import { MOCK_ACTIVITIES } from '../data/mock-activities';
+import { IMG } from '../data/images';
 import { MOCK_DESTINATIONS } from '../data/mock-destinations';
 import { MOCK_EXPENSES } from '../data/mock-expenses';
 import { MOCK_RESERVATIONS } from '../data/mock-reservations';
@@ -24,16 +26,20 @@ import {
   User
 } from '../models/models';
 import { TripService } from './trip.service';
+import { ActivityService } from './activity.service';
 import { ReservationService } from './reservation.service';
 import { errorMessage, fromApi, fromViewModel, isBackendId, toViewModel } from './reservation.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class TravelStore {
   private readonly tripService = inject(TripService);
+  private readonly activityService = inject(ActivityService);
   private readonly reservationService = inject(ReservationService);
 
   readonly trips = signal<Trip[]>(MOCK_TRIPS);
-  readonly activities = signal<Activity[]>(MOCK_ACTIVITIES);
+  readonly activities = signal<Activity[]>([]);
+  readonly activitiesLoading = signal(false);
+  readonly activitiesError = signal<string | null>(null);
   readonly destinations = signal(MOCK_DESTINATIONS);
   // Reservations: filled from the backend (GET /reservations/me); mocks only if the API is unreachable
   readonly reservations = signal<Reservation[]>([]);
@@ -59,8 +65,53 @@ export class TravelStore {
 
   constructor() {
     this.loadTripsFromBackend();
+    this.loadActivitiesFromBackend();
     // Deferred: an HTTP call made while the store is being built would re-enter it through the interceptor
     setTimeout(() => this.loadReservationsFromBackend());
+  }
+
+  /** Loads persisted activities from the backend. */
+  loadActivitiesFromBackend(): void {
+    this.activitiesLoading.set(true);
+    this.activitiesError.set(null);
+    this.activityService.getAll().subscribe({
+      next: (items) => {
+        this.activities.set(items.map((item) => this.mapBackendActivity(item)));
+        this.activitiesLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Could not load activities from backend:', err);
+        this.activities.set([]);
+        this.activitiesError.set('Could not load activities from the server. Please try again.');
+        this.activitiesLoading.set(false);
+      }
+    });
+  }
+
+  private mapBackendActivity(item: BackendActivity): Activity {
+    const categoryMap: Record<BackendActivity['category'], Activity['category']> = {
+      SIGHTSEEING: 'CULTURE',
+      RESTAURANT: 'FOOD',
+      TRANSPORT: 'ADVENTURE',
+      LEISURE: 'RELAXATION'
+    };
+    const category = categoryMap[item.category];
+    const imageByCategory: Record<Activity['category'], keyof typeof IMG> = {
+      ADVENTURE: 'adventure', CULTURE: 'culture', FOOD: 'food',
+      NATURE: 'nature', SPORT: 'sport', RELAXATION: 'relaxation'
+    };
+    const sample = MOCK_ACTIVITIES.find((activity) => activity.category === category);
+    return {
+      id: String(item.id),
+      name: item.name,
+      category,
+      durationHours: 0,
+      price: item.estimatedCost ?? 0,
+      description: item.description ?? '',
+      location: item.location ?? '',
+      image: sample?.image ?? IMG[imageByCategory[category]],
+      rating: 0
+    };
   }
 
   private loadInitialUser(): User {

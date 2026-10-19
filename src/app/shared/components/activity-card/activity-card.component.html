@@ -7,7 +7,9 @@
     <h3>{{ activity.name }}</h3>
     <p>{{ activity.description }}</p>
     <div class="meta">
-      <span>{{ activity.durationHours }} hrs</span>
+      @if (activity.durationHours > 0) {
+        <span>{{ activity.durationHours }} hrs</span>
+      }
       <strong>{{ activity.price | currency:'USD':'symbol':'1.0-0' }}</strong>
     </div>
     <a class="btn btn-primary" [routerLink]="['/activities', activity.id]">View Activity</a>
