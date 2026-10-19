@@ -1,5 +1,101 @@
-<section class="placeholder-page">
-  <p class="eyebrow">Admin workspace</p>
-  <h2>Dashboard</h2>
-  <p class="muted">The administration dashboard will be available in a future step.</p>
+<section class="dashboard-section">
+  <div class="dash-header">
+    <p class="eyebrow">Admin workspace</p>
+    <h2>Dashboard</h2>
+    <p class="muted">System status, administrative controls, and quick management links.</p>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="dash-grid">
+    <!-- Trips Management Card -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="card-icon card-icon-teal">✈</div>
+        <span class="badge badge-teal">Live API</span>
+      </div>
+
+      <div class="dash-card-body">
+        <h3>Trips Management</h3>
+        <p class="muted">Manage travel packages, daily itineraries, pricing, and cover images.</p>
+
+        <div class="stat-highlight">
+          <strong class="stat-num">{{ tripsCount() !== null ? tripsCount() : '—' }}</strong>
+          <span class="stat-text">Total Trips in DB</span>
+        </div>
+      </div>
+
+      <div class="dash-card-actions">
+        <a class="btn btn-outline" routerLink="/admin/trips">View all trips</a>
+        <a class="btn btn-primary" routerLink="/admin/trips/new">+ New trip</a>
+      </div>
+    </div>
+
+    <!-- Users Management Card -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="card-icon card-icon-blue">👥</div>
+        <span class="badge badge-blue">Live API</span>
+      </div>
+
+      <div class="dash-card-body">
+        <h3>Users Management</h3>
+        <p class="muted">View registered travelers, manage admin accounts, roles, and status.</p>
+
+        <div class="stat-highlight">
+          <strong class="stat-num">{{ usersCount() !== null ? usersCount() : '—' }}</strong>
+          <span class="stat-text">Registered Accounts</span>
+        </div>
+      </div>
+
+      <div class="dash-card-actions">
+        <a class="btn btn-outline" routerLink="/admin/users">View all users</a>
+        <a class="btn btn-primary" routerLink="/admin/users/new">+ New user</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backend Integration Info Card -->
+  <div class="api-info-card">
+    <div class="api-info-header">
+      <span class="status-indicator"></span>
+      <h4>Backend Trip CRUD Endpoints Tested</h4>
+    </div>
+    <div class="endpoints-list">
+      <div class="endpoint-item">
+        <span class="method method-post">POST</span>
+        <code>/api/trips</code>
+        <span class="desc">Create trip with multipart details, highlights, itinerary & coverImage</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method method-get">GET</span>
+        <code>/api/trips</code>
+        <span class="desc">List all trips</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method method-get">GET</span>
+        <code>/api/trips/:id</code>
+        <span class="desc">Get trip details by ID</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method method-get">GET</span>
+        <code>/api/trips/user/:userId</code>
+        <span class="desc">Filter trips created by user ID</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method method-get">GET</span>
+        <code>/api/trips/:id/cover-image</code>
+        <span class="desc">Stream cover image BLOB (JPEG)</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method method-put">PUT</span>
+        <code>/api/trips/:id</code>
+        <span class="desc">Update trip fields & replacement coverImage</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method method-del">DELETE</span>
+        <code>/api/trips/:id</code>
+        <span class="desc">Delete trip by ID</span>
+      </div>
+    </div>
+  </div>
 </section>

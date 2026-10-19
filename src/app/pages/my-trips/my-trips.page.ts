@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TripStatus } from '../../core/models/models';
 import { TravelStore } from '../../core/services/travel.store';
@@ -13,10 +13,14 @@ import { TripCardComponent } from '../../shared/components/trip-card/trip-card.c
   templateUrl: './my-trips.page.html',
   styleUrl: './my-trips.page.scss'
 })
-export class MyTripsPage {
+export class MyTripsPage implements OnInit {
   private readonly store = inject(TravelStore);
   readonly tab = signal<'booked' | 'saved'>('booked');
   readonly status = signal<TripStatus | 'ALL'>('ALL');
+
+  ngOnInit(): void {
+    this.store.loadTripsFromBackend();
+  }
 
   readonly booked = computed(() => {
     const status = this.status();

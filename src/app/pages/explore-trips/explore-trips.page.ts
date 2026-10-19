@@ -33,6 +33,7 @@ export class ExploreTripsPage implements OnInit {
   readonly trips = computed(() => this.applyFilters(this.store.trips()));
 
   ngOnInit(): void {
+    this.store.loadTripsFromBackend();
     this.route.queryParamMap.subscribe((params) => {
       const q = params.get('q') ?? '';
       const category = params.get('category') ?? '';

@@ -1,6 +1,6 @@
 <article class="card">
   <a [routerLink]="['/trips', trip.id]" class="media">
-    <img [src]="trip.image" [alt]="trip.title" />
+    <img [src]="trip.image" [alt]="trip.title" (error)="onImgError($event)" />
     @if (trip.badge) {
       <app-status-badge [badge]="trip.badge" />
     }

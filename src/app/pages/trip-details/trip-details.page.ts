@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TravelStore } from '../../core/services/travel.store';
 import { BookingDraftService } from '../../core/services/booking-draft.service';
@@ -14,7 +14,7 @@ import { ToastService } from '../../core/services/toast.service';
   templateUrl: './trip-details.page.html',
   styleUrl: './trip-details.page.scss'
 })
-export class TripDetailsPage {
+export class TripDetailsPage implements OnInit {
   private readonly store = inject(TravelStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -24,9 +24,23 @@ export class TripDetailsPage {
   readonly trip = computed(() => this.store.tripById(this.route.snapshot.paramMap.get('id') ?? ''));
   readonly activities = computed(() => {
     const trip = this.trip();
-    if (!trip) return [];
-    return this.store.activities().filter((activity) => trip.activityIds.includes(activity.id));
+    if (!trip || !trip.activityIds) return [];
+    return this.store.activities().filter((activity) => trip.activityIds?.includes(activity.id));
   });
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.store.ensureTripLoaded(id);
+    }
+  }
+
+  onImgError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80';
+    }
+  }
 
   liked(): boolean {
     const trip = this.trip();

@@ -1,28 +1,84 @@
 <section class="page container">
-  <app-page-header eyebrow="Bookings" title="Reservations" subtitle="Hotels, transport, activities, and trip packages in one list." />
-  <div class="pills" style="margin-bottom:18px">
-    @for (item of statuses; track item) {
-      <button class="pill" type="button" [class.active]="status() === item" (click)="status.set(item)">
-        {{ item === 'ALL' ? 'All' : item.charAt(0) + item.slice(1).toLowerCase() }}
-      </button>
+  <app-page-header eyebrow="Bookings" title="My reservations"
+                   subtitle="Trip packages, hotels, transport, restaurants and activities in one place.">
+    <a class="btn btn-primary" routerLink="/trips">Book a trip</a>
+  </app-page-header>
+
+  @if (bookedTrips().length) {
+    <div class="card ai-strip">
+      <div>
+        <p class="eyebrow">AI trip check</p>
+        <p class="muted">Let the AI look at your bookings and tell you what is still missing.</p>
+      </div>
+      <div class="pills">
+        @for (trip of bookedTrips(); track trip.tripId) {
+          <button class="pill" type="button" [class.active]="aiTripId() === trip.tripId" (click)="toggleAi(trip.tripId)">
+            ✦ {{ trip.title }}
+          </button>
+        }
+      </div>
+    </div>
+    @if (aiTripId(); as tripId) {
+      <app-reservation-ai-assistant [tripId]="tripId" />
     }
+  }
+
+  <div class="toolbar">
+    <div class="pills">
+      <button class="pill" type="button" [class.active]="status() === 'ALL'" (click)="status.set('ALL')">
+        All <span class="count">{{ countFor('ALL') }}</span>
+      </button>
+      @for (item of statuses; track item) {
+        <button class="pill" type="button" [class.active]="status() === item" (click)="status.set(item)">
+          {{ statusLabel(item) }} <span class="count">{{ countFor(item) }}</span>
+        </button>
+      }
+    </div>
+    <div class="filters">
+      <select class="input" [ngModel]="type()" (ngModelChange)="type.set($event)" name="type" aria-label="Type">
+        <option value="ALL">All types</option>
+        @for (t of types; track t) {
+          <option [value]="t">{{ typeLabel(t) }}</option>
+        }
+      </select>
+      <input class="input" type="search" [ngModel]="search()" (ngModelChange)="search.set($event)" name="search"
+             placeholder="Search trip, code, notes…" aria-label="Search" />
+    </div>
   </div>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      <button class="btn btn-outline" type="button" (click)="reload()">Retry</button>
+    </div>
+  }
+
   <div class="card list">
-    @if (items().length) {
+    @if (loading() && !all().length) {
+      <app-loading />
+    } @else if (items().length) {
       @for (reservation of items(); track reservation.id) {
         <app-reservation-card [reservation]="reservation" (cancel)="askCancel($event)" />
       }
+    } @else if (all().length) {
+      <app-empty-state title="No matching reservation" message="Try another status, type or search.">
+        <button class="btn btn-outline" type="button" (click)="clearFilters()">Clear filters</button>
+      </app-empty-state>
     } @else {
-      <app-empty-state title="No reservations" message="Book a trip or activity to populate this list." />
+      <app-empty-state title="No reservations yet" message="Book a trip to see it here.">
+        <a class="btn btn-primary" routerLink="/trips">Explore trips</a>
+      </app-empty-state>
     }
   </div>
 </section>
 
 <app-modal [open]="!!pendingId()" (closed)="pendingId.set(null)">
   <h2>Cancel this reservation?</h2>
-  <p class="muted">This marks the booking as cancelled. You can still view it in the cancelled filter.</p>
+  <p class="muted">{{ pendingTitle() }} will be marked as cancelled. You can still see it with the “Cancelled” filter.</p>
   <div class="row">
-    <button class="btn btn-outline" type="button" (click)="pendingId.set(null)">Keep it</button>
-    <button class="btn btn-primary" type="button" (click)="confirmCancel()">Cancel reservation</button>
+    <button class="btn btn-outline" type="button" (click)="pendingId.set(null)" [disabled]="cancelling()">Keep it</button>
+    <button class="btn btn-primary" type="button" (click)="confirmCancel()" [disabled]="cancelling()">
+      {{ cancelling() ? 'Cancelling…' : 'Cancel reservation' }}
+    </button>
   </div>
 </app-modal>

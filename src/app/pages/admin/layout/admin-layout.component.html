@@ -14,9 +14,17 @@
         <span class="nav-icon" aria-hidden="true">▦</span>
         <span>Dashboard</span>
       </a>
-      <a routerLink="/admin/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()">
+      <a routerLink="/admin/users" routerLinkActive="active" (click)="closeSidebar()">
         <span class="nav-icon" aria-hidden="true">♙</span>
         <span>Users</span>
+      </a>
+      <a routerLink="/admin/trips" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-icon" aria-hidden="true">✈</span>
+        <span>Trips</span>
+      </a>
+      <a routerLink="/admin/reservations" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-icon" aria-hidden="true">✓</span>
+        <span>Reservations</span>
       </a>
     </nav>
 

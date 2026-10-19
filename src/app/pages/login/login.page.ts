@@ -105,7 +105,49 @@ export class LoginPage implements AfterViewInit, OnDestroy {
       next: (session) => {
         this.finishLogin(session);
       },
-      error: (error: { error?: { message?: string } }) => this.error.set(error.error?.message ?? 'Unable to sign in. Check your email and password.')
+      error: (error: HttpErrorResponse) => {
+        this.googleLoading.set(false);
+        this.error.set(this.getErrorMessage(error));
+      }
     });
+  }
+
+  private handleAuthSuccess(response: AuthResponse, toastTitle: string): void {
+    this.tokenService.saveAccessToken(response.accessToken);
+    if (response.refreshToken) {
+      this.tokenService.saveRefreshToken(response.refreshToken);
+    }
+
+    const firstChar = response.firstName ? response.firstName[0] : 'U';
+    const lastChar = response.lastName ? response.lastName[0] : '';
+
+    this.store.updateUser({
+      id: response.id,
+      firstName: response.firstName || 'Traveler',
+      lastName: response.lastName || '',
+      email: response.username,
+      avatarInitials: `${firstChar}${lastChar}`.toUpperCase(),
+      role: response.role === Role.ADMIN ? 'ADMIN' : 'TRAVELER'
+    });
+
+    this.store.loggedIn.set(true);
+    this.store.loadTripsFromBackend();
+    this.toast.show(toastTitle, 'Your trips and reservations are ready.');
+    void this.router.navigate(response.role === Role.ADMIN ? ['/admin'] : ['/my-trips']);
+  }
+
+  private getErrorMessage(error: HttpErrorResponse): string {
+    const validationErrors = error.error?.errors as Record<string, string> | undefined;
+    if (validationErrors) {
+      return Object.values(validationErrors).join(' ');
+    }
+
+    if (typeof error.error?.message === 'string') {
+      return error.error.message;
+    }
+
+    return error.status === 401
+      ? 'Invalid credentials.'
+      : 'Unable to sign in right now. Please try again.';
   }
 }
