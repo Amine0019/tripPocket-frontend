@@ -27,4 +27,5 @@ export class AiService {
   generateItinerary(destination: string, days: number, notes?: string): Observable<ItineraryDay[]> {
     return this.http.post<ItineraryDay[]>(`${this.apiUrl}/trip-itinerary`, { destination, days, notes });
   }
+  
 }

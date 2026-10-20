@@ -22,6 +22,8 @@ import {
 } from '../models/models';
 import { TripService } from './trip.service';
 
+
+
 @Injectable({ providedIn: 'root' })
 export class TravelStore {
   private readonly tripService = inject(TripService);
