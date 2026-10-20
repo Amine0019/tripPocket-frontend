@@ -154,6 +154,7 @@ export class LoginPage implements AfterViewInit, OnDestroy {
     });
 
     this.store.loggedIn.set(true);
+    this.store.loadTripsFromBackend();
     this.toast.show(toastTitle, 'Your trips and reservations are ready.');
     void this.router.navigate(response.role === Role.ADMIN ? ['/admin'] : ['/my-trips']);
   }

@@ -1,0 +1,467 @@
+<section class="form-section">
+  <!-- Header -->
+  <div class="form-header">
+    <a class="back-link" routerLink="/admin/trips">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+      Back to trips
+    </a>
+    <h2>{{ isEdit() ? 'Edit trip' : 'Create trip' }}</h2>
+    <p class="muted">
+      {{ isEdit() ? 'Update trip details, schedule, pricing, cover image, and itinerary.' : 'Fill in the details below to create a new curated trip package.' }}
+    </p>
+  </div>
+
+  <!-- Loading skeleton -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading trip…</p>
+    </div>
+  }
+
+  <!-- Form -->
+  @if (!loading()) {
+    <form class="trip-form" (submit)="$event.preventDefault(); save()" novalidate>
+
+      <!-- Validation errors from backend -->
+      @if (errorList().length > 0) {
+        <div class="error-alert" role="alert">
+          <div class="error-title">
+            <span>⚠</span>
+            <strong>Please correct the following:</strong>
+          </div>
+          <ul>
+            @for (err of errorList(); track err) {
+              <li>{{ err }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      <!-- ── SECTION 1: OVERVIEW ── -->
+      <div class="form-card">
+        <h3 class="card-section-title">
+          <span class="step-num">1</span> Trip Overview
+        </h3>
+
+        <div class="form-grid">
+          <!-- Destination (required) -->
+          <label class="field span-2">
+            <span>Destination <em class="required">*</em></span>
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="draft.destination"
+              name="destination"
+              placeholder="e.g. Japan, Paris, Bali"
+              required
+            />
+          </label>
+
+          <!-- Title -->
+          <label class="field">
+            <span>Title</span>
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="draft.title"
+              name="title"
+              placeholder="e.g. Discover Japan"
+            />
+          </label>
+
+          <!-- Subtitle -->
+          <label class="field">
+            <span>Subtitle</span>
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="draft.subtitle"
+              name="subtitle"
+              placeholder="e.g. Tokyo, Kyoto & Osaka · 7 days"
+            />
+          </label>
+
+          <!-- Status -->
+          <label class="field">
+            <span>Status</span>
+            <select class="input" [(ngModel)]="draft.status" name="status">
+              <option value="PLANNED">PLANNED</option>
+              <option value="ONGOING">ONGOING</option>
+              <option value="COMPLETED">COMPLETED</option>
+            </select>
+          </label>
+
+          <!-- Badge -->
+          <label class="field">
+            <span>Badge / Ribbon</span>
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="draft.badge"
+              name="badge"
+              placeholder="e.g. Best seller, Popular, Trending"
+            />
+          </label>
+        </div>
+
+        <!-- ✨ AI assistant -->
+        <div class="ai-box">
+          <div class="ai-box-head">
+            <strong>✨ AI assistant</strong>
+            <span class="field-hint">Type 2-3 keywords (e.g. "Egypt, Giza") to generate a title and a short description.</span>
+          </div>
+          <div class="add-highlight-row">
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="aiKeywords"
+              name="aiKeywords"
+              placeholder="e.g. Egypt, Giza, pyramids"
+              (keyup.enter)="generateTagline()"
+            />
+            <button type="button" class="btn btn-primary" (click)="generateTagline()" [disabled]="aiTaglineLoading()">
+              @if (aiTaglineLoading()) { Generating… } @else { ✨ Generate }
+            </button>
+          </div>
+          @if (aiError()) {
+            <p class="ai-error">{{ aiError() }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- ── SECTION 2: DATES & SCHEDULE ── -->
+      <div class="form-card">
+        <h3 class="card-section-title">
+          <span class="step-num">2</span> Schedule & Dates
+        </h3>
+
+        <div class="form-grid">
+          <!-- Start Date -->
+          <label class="field">
+            <span>Start date <em class="required">*</em></span>
+            <input
+              class="input"
+              type="date"
+              [(ngModel)]="draft.startDate"
+              name="startDate"
+              (change)="onDatesChange()"
+              required
+            />
+          </label>
+
+          <!-- End Date -->
+          <label class="field">
+            <span>End date <em class="required">*</em></span>
+            <input
+              class="input"
+              type="date"
+              [(ngModel)]="draft.endDate"
+              name="endDate"
+              (change)="onDatesChange()"
+              required
+            />
+          </label>
+
+          <!-- Duration Days -->
+          <label class="field span-2">
+            <span>Duration (Days) <small class="field-hint">(Auto-calculated if blank)</small></span>
+            <input
+              class="input"
+              type="number"
+              min="1"
+              [(ngModel)]="draft.durationDays"
+              name="durationDays"
+              placeholder="e.g. 7"
+            />
+          </label>
+        </div>
+      </div>
+
+      <!-- ── SECTION 3: PRICING & LOGISTICS ── -->
+      <div class="form-card">
+        <h3 class="card-section-title">
+          <span class="step-num">3</span> Pricing & Logistics
+        </h3>
+
+        <div class="form-grid">
+          <!-- Price -->
+          <label class="field">
+            <span>Price per person</span>
+            <input
+              class="input"
+              type="number"
+              min="0"
+              step="0.01"
+              [(ngModel)]="draft.price"
+              name="price"
+              placeholder="e.g. 1290.00"
+            />
+          </label>
+
+          <!-- Currency -->
+          <label class="field">
+            <span>Currency</span>
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="draft.currency"
+              name="currency"
+              placeholder="USD, EUR, TND"
+            />
+          </label>
+
+          <!-- Availability -->
+          <label class="field">
+            <span>Availability Window</span>
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="draft.availability"
+              name="availability"
+              placeholder="e.g. Available May–October"
+            />
+          </label>
+
+          <!-- Group Size -->
+          <label class="field">
+            <span>Group Size</span>
+            <input
+              class="input"
+              type="number"
+              min="1"
+              [(ngModel)]="draft.groupSize"
+              name="groupSize"
+              placeholder="e.g. 12"
+            />
+          </label>
+
+          <!-- Pace -->
+          <label class="field">
+            <span>Travel Pace</span>
+            <input
+              class="input"
+              type="text"
+              [(ngModel)]="draft.pace"
+              name="pace"
+              placeholder="e.g. Balanced, Fast-paced, Relaxed"
+            />
+          </label>
+
+          <!-- Rating -->
+          <label class="field">
+            <span>Rating (out of 5)</span>
+            <input
+              class="input"
+              type="number"
+              min="0"
+              max="5"
+              step="0.1"
+              [(ngModel)]="draft.rating"
+              name="rating"
+              placeholder="e.g. 4.9"
+            />
+          </label>
+
+          <!-- Review Count -->
+          <label class="field">
+            <span>Review Count</span>
+            <input
+              class="input"
+              type="number"
+              min="0"
+              [(ngModel)]="draft.reviewCount"
+              name="reviewCount"
+              placeholder="e.g. 126"
+            />
+          </label>
+
+          <!-- User ID (Owner Assignment) -->
+          <label class="field">
+            <span>Assigned User ID <small class="field-hint">(Optional, defaults to you)</small></span>
+            <input
+              class="input"
+              type="number"
+              [(ngModel)]="draft.userId"
+              name="userId"
+              placeholder="e.g. 1"
+            />
+          </label>
+        </div>
+      </div>
+
+      <!-- ── SECTION 4: COVER IMAGE ── -->
+      <div class="form-card">
+        <h3 class="card-section-title">
+          <span class="step-num">4</span> Cover Image
+        </h3>
+
+        <div class="image-upload-zone">
+          <div class="image-preview-box">
+            @if (filePreviewUrl) {
+              <img [src]="filePreviewUrl" alt="Cover preview" class="preview-img" />
+            } @else if (isEdit() && tripId) {
+              <app-trip-cover-image [tripId]="tripId" alt="Current cover"></app-trip-cover-image>
+            } @else {
+              <div class="image-empty-placeholder">
+                <span>🖼</span>
+                <p>No cover image chosen</p>
+              </div>
+            }
+          </div>
+
+          <div class="upload-controls">
+            <label class="btn btn-outline file-label">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Choose Image File
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" class="file-hidden-input" />
+            </label>
+
+            @if (selectedFile) {
+              <div class="selected-file-badge">
+                <span class="file-name">{{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
+                <button type="button" class="btn-remove-file" (click)="clearSelectedFile()">✕</button>
+              </div>
+            } @else if (isEdit()) {
+              <span class="field-hint">Leave untouched to keep the current cover image.</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 5: DESCRIPTION ── -->
+      <div class="form-card">
+        <h3 class="card-section-title">
+          <span class="step-num">5</span> Description & Overview
+        </h3>
+
+        <label class="field">
+          <span>Full Description</span>
+          <textarea
+            class="input textarea"
+            rows="5"
+            [(ngModel)]="draft.description"
+            name="description"
+            placeholder="Describe what makes this journey unforgettable, key destinations, scenery, culture, and inclusions…"
+          ></textarea>
+        </label>
+      </div>
+
+      <!-- ── SECTION 6: HIGHLIGHTS ── -->
+      <div class="form-card">
+        <h3 class="card-section-title">
+          <span class="step-num">6</span> Trip Highlights
+        </h3>
+
+        <div class="highlights-builder">
+          <div class="add-highlight-row">
+            <input
+              type="text"
+              class="input"
+              placeholder="e.g. Bullet train pass across Kyoto and Osaka"
+              [(ngModel)]="newHighlight"
+              name="newHighlight"
+              (keyup.enter)="addHighlight()"
+            />
+            <button type="button" class="btn btn-primary" (click)="addHighlight()">
+              + Add
+            </button>
+          </div>
+
+          @if (draft.highlights && draft.highlights.length > 0) {
+            <ul class="highlights-list">
+              @for (h of draft.highlights; track $index) {
+                <li class="highlight-item">
+                  <span class="highlight-bullet">✦</span>
+                  <span class="highlight-text">{{ h }}</span>
+                  <button type="button" class="btn-remove-item" (click)="removeHighlight($index)" title="Remove highlight">
+                    ✕
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="field-hint empty-list-hint">No highlights added yet. Add key selling points above.</p>
+          }
+        </div>
+      </div>
+
+      <!-- ── SECTION 7: ITINERARY ── -->
+      <div class="form-card">
+        <div class="card-section-header">
+          <h3 class="card-section-title">
+            <span class="step-num">7</span> Day-by-Day Itinerary
+          </h3>
+          <div class="header-actions">
+            <button type="button" class="btn btn-sm btn-primary" (click)="generateItinerary()" [disabled]="aiItineraryLoading()">
+              @if (aiItineraryLoading()) { Planning… } @else { ✨ Suggest with AI }
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" (click)="addItineraryDay()">
+              + Add Day
+            </button>
+          </div>
+        </div>
+
+        <div class="itinerary-builder">
+          @if (draft.itinerary && draft.itinerary.length > 0) {
+            @for (day of draft.itinerary; track $index) {
+              <div class="itinerary-day-card">
+                <div class="day-card-header">
+                  <span class="day-badge">Day {{ day.dayNumber || ($index + 1) }}</span>
+                  <button type="button" class="btn-remove-item" (click)="removeItineraryDay($index)" title="Remove day">
+                    ✕
+                  </button>
+                </div>
+
+                <div class="form-grid">
+                  <label class="field span-2">
+                    <span>Title</span>
+                    <input
+                      type="text"
+                      class="input"
+                      [(ngModel)]="day.title"
+                      [name]="'day_title_' + $index"
+                      placeholder="e.g. Arrival in Tokyo & Evening Shibuya Tour"
+                    />
+                  </label>
+
+                  <label class="field span-2">
+                    <span>Description</span>
+                    <textarea
+                      class="input textarea"
+                      rows="3"
+                      [(ngModel)]="day.description"
+                      [name]="'day_desc_' + $index"
+                      placeholder="Details of today's activities, meals, sights and transfers…"
+                    ></textarea>
+                  </label>
+                </div>
+              </div>
+            }
+          } @else {
+            <p class="field-hint empty-list-hint">
+              No itinerary days added yet. Click "+ Add Day" to build the daily schedule.
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- ── FORM ACTIONS ── -->
+      <div class="form-actions-card">
+        <a class="btn btn-outline" routerLink="/admin/trips">Cancel</a>
+        <button class="btn btn-primary btn-save" type="submit" [disabled]="saving()">
+          @if (saving()) {
+            <div class="spinner-inline"></div>
+            Saving…
+          } @else {
+            {{ isEdit() ? 'Save Trip Changes' : 'Create Trip' }}
+          }
+        </button>
+      </div>
+    </form>
+  }
+</section>

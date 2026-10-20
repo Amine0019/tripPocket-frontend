@@ -1,0 +1,50 @@
+<section class="activities-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h2>Activities</h2>
+      <p class="muted">Create and manage activities available for your trips.</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/admin/activities/new">＋ New Activity</a>
+  </header>
+
+  <section class="summary-card" aria-label="Activity summary">
+    <span>Total activities</span>
+    <strong>{{ total() }}</strong>
+  </section>
+
+  @if (loading()) {
+    <div class="state-card">Loading activities from backend...</div>
+  } @else if (error()) {
+    <div class="state-card error-state">
+      <p>{{ error() }}</p>
+      <button class="btn btn-outline" type="button" (click)="loadActivities()">Try again</button>
+    </div>
+  } @else if (activities().length) {
+    <div class="activity-list">
+      @for (activity of activities(); track activity.id) {
+        <article class="activity-card">
+          <div class="activity-copy">
+            <span class="category">{{ activity.category }}</span>
+            <h3>{{ activity.name }}</h3>
+            <p>{{ activity.description || 'No description provided.' }}</p>
+            <div class="meta">
+              @if (activity.location) { <span>{{ activity.location }}</span> }
+              @if (activity.activityDate) { <span>{{ activity.activityDate | date:'medium' }}</span> }
+              <span>{{ activity.estimatedCost | currency:'USD':'symbol':'1.0-2' }}</span>
+            </div>
+          </div>
+          <span class="status" [class.complete]="activity.completed">
+            {{ activity.completed ? 'Completed' : 'Planned' }}
+          </span>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="state-card">
+      <h3>No activities yet</h3>
+      <p>Create the first activity to make it available to travelers.</p>
+      <a class="btn btn-primary" routerLink="/admin/activities/new">Create Activity</a>
+    </div>
+  }
+</section>

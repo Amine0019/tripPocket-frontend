@@ -1,6 +1,6 @@
 <section class="page container">
   <app-page-header eyebrow="Budget" title="Expenses" subtitle="Track spend by trip, category, and payment method.">
-    <button class="btn btn-primary" type="button" (click)="open.set(true)">Add expense</button>
+    <button class="btn btn-primary" type="button" (click)="openExpenseForm()">Add expense</button>
   </app-page-header>
 
   <div class="stat-row" style="margin-bottom:22px">
@@ -18,16 +18,75 @@
         </button>
       }
     </div>
-    <select class="input" style="max-width:240px" [(ngModel)]="tripFilter" (ngModelChange)="tripId.set($event)">
+    <select class="input" style="max-width:240px" [ngModel]="tripFilter" (ngModelChange)="selectTrip($event)">
       <option value="">All trips</option>
       @for (trip of trips(); track trip.id) {
-        <option [value]="trip.id">{{ trip.title }}</option>
+        <option [value]="trip.id">{{ trip.title || trip.destination }}</option>
       }
     </select>
   </div>
+  @if (tripsError()) {
+    <div class="insight-error" role="alert"><span>{{ tripsError() }}</span><button class="ghost" type="button" (click)="loadBackendTrips()">Retry</button></div>
+  } @else if (tripsLoading()) {
+    <p class="insight-message" role="status">Loading trips from the backend…</p>
+  } @else if (!trips().length) {
+    <p class="insight-message">No backend trips found. Create a trip before adding expenses or analyzing spending.</p>
+  }
+
+  <section class="insights card pad" aria-labelledby="insights-title">
+    <div class="insights-heading">
+      <div><span class="insights-kicker">AI spending insights</span><h2 id="insights-title">Understand your trip spend</h2>
+        <p class="muted">Insights use expenses saved for the selected backend trip.</p></div>
+      <button class="btn btn-primary analyze-button" type="button" (click)="loadInsights()" [disabled]="insightLoading() || !backendTripId" [attr.title]="!backendTripId ? 'Select a saved trip above first' : null">
+        {{ insightLoading() ? 'Analyzing…' : !backendTripId ? 'Select a trip first' : insight() ? 'Analyze again' : 'Analyze my spending' }}
+      </button>
+    </div>
+    @if (!backendTripId) {
+      <p class="insight-message">Choose a saved trip above to load its backend expenses and budget.</p>
+    }
+    @if (insightLoading()) { <p class="insight-message" role="status">Calculating totals and asking Ollama for observations…</p> }
+    @if (insightError()) {
+      <div class="insight-error" role="alert"><span>{{ insightError() }}</span><button class="ghost" type="button" (click)="loadInsights()">Retry</button></div>
+    }
+    @if (insight(); as result) {
+      <div class="insight-stats">
+        <div class="insight-stat"><span>Total expenses</span><strong>{{ result.totalExpenses | currency:result.currency:'symbol':'1.2-2' }}</strong></div>
+        <div class="insight-stat"><span>Total budget</span><strong>{{ result.totalBudget | currency:result.currency:'symbol':'1.2-2' }}</strong></div>
+        <div class="insight-stat"><span>Budget remaining</span><strong>{{ result.budgetRemaining | currency:result.currency:'symbol':'1.2-2' }}</strong></div>
+        <div class="insight-stat"><span>Budget used</span><strong>{{ result.percentageUsed === null ? 'N/A' : result.percentageUsed + '%' }}</strong></div>
+      </div>
+      <div class="budget-status" [class.over-budget]="result.overBudget">
+        {{ result.overBudget ? 'Over budget' : 'Within budget' }}
+      </div>
+      @if (result.percentageUsed !== null) {
+        <div class="budget-track" role="progressbar" aria-label="Budget used" [attr.aria-valuenow]="result.percentageUsed" aria-valuemin="0" aria-valuemax="100">
+          <span [style.width.%]="result.percentageUsed > 100 ? 100 : result.percentageUsed" [class.over-budget]="result.overBudget"></span>
+        </div>
+      } @else { <p class="insight-message">Budget usage percentage is unavailable until you set a nonzero budget.</p> }
+      <div class="budget-editor">
+        <label class="field"><span>Set trip budget ({{ result.currency }})</span><input class="input" type="number" min="0" step="0.01" [(ngModel)]="budgetInput" name="tripBudget" /></label>
+        <button class="btn btn-outline" type="button" (click)="saveBudget()" [disabled]="budgetSaving()">{{ budgetSaving() ? 'Saving…' : 'Save budget' }}</button>
+      </div>
+      <div class="category-breakdown">
+        <h3>Spending by category</h3>
+        @for (entry of result.spendingByCategory | keyvalue; track entry.key) {
+          <div class="category-row"><span>{{ entry.key.replace('_', ' ') }}</span><strong>{{ entry.value | currency:result.currency:'symbol':'1.2-2' }}</strong></div>
+        }
+      </div>
+      <div class="ai-analysis">
+        <h3>AI observations and savings ideas</h3>
+        @if (result.aiAvailable && result.aiAnalysis) { <p>{{ result.aiAnalysis }}</p> }
+        @else { <p>AI recommendations are temporarily unavailable. Your calculated spending statistics are still available.</p><button class="ghost" type="button" (click)="loadInsights()">Retry AI analysis</button> }
+      </div>
+    }
+  </section>
 
   <div class="card pad">
-    @if (items().length) {
+    @if (expensesLoading()) {
+      <p class="insight-message" role="status">Loading saved expenses…</p>
+    } @else if (expensesError()) {
+      <div class="insight-error" role="alert"><span>{{ expensesError() }}</span><button class="ghost" type="button" (click)="loadExpenses()">Retry</button></div>
+    } @else if (items().length) {
       @for (expense of items(); track expense.id) {
         <div class="line">
           <app-expense-card [expense]="expense" />
@@ -42,6 +101,7 @@
 
 <app-modal [open]="open()" (closed)="open.set(false)">
   <h2>New expense</h2>
+  @if (expenseFormError()) { <p class="insight-error" role="alert">{{ expenseFormError() }}</p> }
   <div class="form-grid" style="margin-top:16px">
     <label class="field span-2"><span>Title</span><input class="input" [(ngModel)]="form.title" name="title" /></label>
     <label class="field">
@@ -62,14 +122,14 @@
     <label class="field"><span>Date</span><input class="input" type="date" [(ngModel)]="form.date" name="date" /></label>
     <label class="field span-2">
       <span>Trip</span>
-      <select class="input" [(ngModel)]="form.tripId" name="trip">
-        @for (trip of trips(); track trip.id) { <option [value]="trip.id">{{ trip.title }}</option> }
+      <select class="input" [(ngModel)]="form.tripId" name="trip" (ngModelChange)="expenseFormError.set('')">
+        @for (trip of trips(); track trip.id) { <option [value]="trip.id">{{ trip.title || trip.destination }}</option> }
       </select>
     </label>
     <label class="field span-2"><span>Notes</span><textarea class="input" rows="3" [(ngModel)]="form.description" name="desc"></textarea></label>
   </div>
   <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
     <button class="btn btn-outline" type="button" (click)="open.set(false)">Close</button>
-    <button class="btn btn-primary" type="button" (click)="save()" [disabled]="!form.title || !form.amount">Save</button>
+    <button class="btn btn-primary" type="button" (click)="save()" [disabled]="expenseSaving() || !isBackendTripId(form.tripId)">{{ expenseSaving() ? 'Saving…' : 'Save' }}</button>
   </div>
 </app-modal>

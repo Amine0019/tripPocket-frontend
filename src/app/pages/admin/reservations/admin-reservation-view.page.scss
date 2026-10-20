@@ -1,0 +1,33 @@
+.view { animation: fadeUp .35s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.back { display: inline-block; margin-bottom: 16px; color: var(--teal); font-weight: 600; font-size: 14px; }
+.grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; align-items: start; }
+.side { display: grid; gap: 16px; }
+.panel { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+.panel h3 { margin: 0 0 10px; font-size: 15px; }
+.banner { margin: -20px -20px 18px; height: 160px; overflow: hidden; border-radius: 16px 16px 0 0; }
+.banner img { width: 100%; height: 100%; object-fit: cover; display: block; background: var(--teal-soft); }
+.head { display: flex; align-items: center; gap: 14px; }
+.head > div { flex: 1; }
+.icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--teal-soft); color: var(--teal); font-size: 20px; }
+.eyebrow { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
+.code { margin: 2px 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 22px; }
+dl { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 22px 0; }
+dl .wide { grid-column: 1 / -1; }
+dt { color: var(--muted); font-size: 12px; }
+dd { margin: 2px 0 0; font-weight: 600; font-size: 14px; }
+dd a, .others a { color: var(--teal); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn-danger { background: #fff; color: #c0392b; border: 1px solid #f1c0b8; }
+.btn-danger:hover { background: #fef2f2; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
+.strong { margin: 0; font-weight: 700; }
+.muted { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.others { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.others li { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font-size: 13px; }
+.others span { color: var(--muted); }
+.loading-state { display: grid; place-items: center; gap: 10px; padding: 48px 0; color: var(--muted); }
+.spinner { width: 32px; height: 32px; border-radius: 50%; border: 3px solid #e6eeec; border-top-color: var(--teal); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.alert-error { background: #fdecea; color: #a23a2c; border-radius: 14px; padding: 10px 14px; font-size: 14px; }
+@media (max-width: 900px) { .grid, dl { grid-template-columns: 1fr; } }

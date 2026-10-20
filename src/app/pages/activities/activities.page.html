@@ -7,13 +7,18 @@
       </button>
     }
   </div>
-  @if (activities().length) {
+  @if (store.activitiesLoading()) {
+    <app-empty-state title="Loading activities" message="Getting activities from the server..." />
+  } @else if (store.activitiesError()) {
+    <app-empty-state title="Activities unavailable" [message]="store.activitiesError() ?? ''" />
+    <button class="btn btn-outline" type="button" (click)="store.loadActivitiesFromBackend()">Try again</button>
+  } @else if (activities().length) {
     <div class="grid-3">
       @for (activity of activities(); track activity.id) {
         <app-activity-card [activity]="activity" />
       }
     </div>
   } @else {
-    <app-empty-state title="No activities" message="Try another category." />
+    <app-empty-state title="No activities" message="The server returned no activities for this category." />
   }
 </section>

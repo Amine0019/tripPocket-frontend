@@ -13,7 +13,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
   styleUrl: './activities.page.scss'
 })
 export class ActivitiesPage {
-  private readonly store = inject(TravelStore);
+  readonly store = inject(TravelStore);
   readonly category = signal<ActivityCategory | 'ALL'>('ALL');
   readonly categories: Array<ActivityCategory | 'ALL'> = ['ALL', 'ADVENTURE', 'CULTURE', 'FOOD', 'NATURE', 'SPORT', 'RELAXATION'];
   readonly activities = computed(() => {
